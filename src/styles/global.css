@@ -1,6 +1,9 @@
 /* 全站樣式進入點:載入 Tailwind CSS */
 @import 'tailwindcss';
 
+/* Markdown 內容(食譜本文)的排版樣式,提供 prose 系列 class */
+@plugin '@tailwindcss/typography';
+
 /* 全站基礎設定 */
 @layer base {
   html {

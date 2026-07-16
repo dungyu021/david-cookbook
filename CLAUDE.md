@@ -59,7 +59,7 @@ ingredients:              # 完整食材清單(含份量),用於「包含/排除
 draft: false              # true 時不會出現在網站上
 ---
 
-(Markdown 本文 = 完整食譜步驟。此區塊為「上鎖內容」,見下方密碼保護章節)
+(Markdown 本文 = 完整食譜步驟,公開顯示於詳細頁食材清單下方)
 ```
 
 **規則:**
@@ -104,19 +104,11 @@ draft: false              # true 時不會出現在網站上
 2. 菜名、星等、hashtags
 3. 預估烹調時間
 4. 食材清單(含份量)
-5. 最下方:**「查看完整食譜」按鈕** → 觸發密碼輸入(見下節)
+5. 最下方:完整食譜本文(Markdown 渲染,公開顯示)
 
-## 食譜密碼保護
+## 食譜密碼保護(已取消)
 
-需求:全站共用一組 4 位數字密碼;**每次查看任一食譜、或重新整理頁面,都需重新輸入**(不做任何記憶/localStorage/sessionStorage 儲存);安全等級要求低,「被破解也沒關係」,但**食譜內容不可以明文出現在頁面原始碼中**。
-
-實作方式(build-time 加密,client-side 解密):
-
-1. 密碼存放於環境變數(本機 `.env`,Cloudflare Pages 專案設定中設同一變數)。**絕不 commit 進 repo。**
-2. Build 時:將每道菜的食譜本文渲染成 HTML 後,以 Web Crypto 相容的 **AES-GCM** 加密(金鑰由密碼經 PBKDF2 衍生),密文與 salt/iv 隨頁面輸出。
-3. Client 端:使用者點「查看完整食譜」→ 彈出 4 位數字輸入框(手機上自動叫出數字鍵盤 `inputmode="numeric"`)→ 用 Web Crypto API 解密 → 成功則就地顯示食譜,失敗則顯示「密碼錯誤」。
-4. 不儲存密碼、不設 cookie——符合「每次都要重新輸入」的需求。
-5. 在程式註解中誠實註明:4 位數字密碼可被暴力破解,此機制僅為「防君子」,符合專案需求。
+原本規劃全站共用 4 位數字密碼、build-time AES 加密保護食譜本文。**David 於 2026-07-16 決定取消此功能**:食譜直接公開顯示在詳細頁食材清單下方,不做任何加密或密碼機制。`.env` 中的 `RECIPE_PASSWORD` 已無作用。
 
 ## 圖片處理原則
 
@@ -151,7 +143,7 @@ draft: false              # true 時不會出現在網站上
 - **Phase 0 — 地基**:Astro + React + Tailwind scaffold;建立 GitHub repo;第一時間接上 Cloudflare Pages 完成首次部署(先部署再開發,之後每次 push 都能在真實手機上驗證)。
 - **Phase 1 — 內容與頁面(僅繁中)**:定義 content collection schema;建立 3 道範例料理;完成清單頁卡片與詳細頁(照片 gallery、食材清單);圖片最佳化管線。
 - **Phase 2 — 篩選與排序**:React 篩選面板(標籤多選、包含/排除食材、時間範圍拉桿含即時數量)、排序切換、URL query 同步、build 時產生 JSON 索引。
-- **Phase 3 — 食譜密碼鎖**:build-time AES 加密 + client 端解密流程 + 密碼輸入 UI。
+- **Phase 3 — 食譜密碼鎖**:~~build-time AES 加密 + client 端解密流程 + 密碼輸入 UI~~(已取消,食譜改為公開顯示,已於 Phase 1.5 實作)。
 - **Phase 4 — 多語系**:i18n routing、語言切換器、翻譯工作流程(含 en/it 檔案產生規則)、hreflang。
 - **Phase 5 — 打磨**:效能調校(Lighthouse)、SEO/OG meta(分享到社群時顯示料理照片)、404 頁、細部動畫、`new-dish` 指令。
 

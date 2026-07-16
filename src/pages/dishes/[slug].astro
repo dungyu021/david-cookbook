@@ -1,7 +1,7 @@
 ---
 // 料理詳細頁(繁體中文版)
-// 結構:照片 gallery → 菜名/星等/標籤 → 烹調時間 → 食材清單 → 完整食譜按鈕(Phase 3)
-import { getCollection } from 'astro:content';
+// 結構:照片 gallery → 菜名/星等/標籤 → 烹調時間 → 食材清單 → 完整食譜
+import { getCollection, render } from 'astro:content';
 import { Image } from 'astro:assets';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import StarRating from '../../components/StarRating.astro';
@@ -20,6 +20,8 @@ export async function getStaticPaths() {
 const { dish } = Astro.props;
 // gallery = 封面照 + 其餘照片
 const photos = [dish.data.cover, ...dish.data.images];
+// 食譜本文(Markdown → HTML)
+const { Content } = await render(dish);
 ---
 
 <BaseLayout title={`${dish.data.title}|伏魔諭廚子`}>
@@ -114,16 +116,12 @@ const photos = [dish.data.cover, ...dish.data.images];
         </ul>
       </section>
 
-      <!-- 完整食譜:Phase 3 會換成密碼解鎖流程 -->
-      <div class="mt-10">
-        <button
-          type="button"
-          disabled
-          class="w-full rounded-xl bg-stone-900 px-4 py-3 font-medium text-white opacity-40"
-        >
-          查看完整食譜(即將推出)
-        </button>
-      </div>
+      <!-- 完整食譜本文(公開顯示) -->
+      <section class="mt-8">
+        <div class="prose prose-stone mt-3 max-w-none prose-headings:text-lg">
+          <Content />
+        </div>
+      </section>
 
       <p class="mt-8">
         <a href="/" class="text-sm text-stone-500 underline underline-offset-4">
