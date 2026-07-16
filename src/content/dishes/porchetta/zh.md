@@ -4,11 +4,12 @@ date: 2023-12-23
 stars: 3
 tags: [義式, 主菜]
 cookingTimeMinutes: 360
+servings: 4
 cover: ./cover.jpg
 images: [./photo-2.jpg, ./photo-3.jpg]
 ingredients:
   - name: 帶皮豬五花肉
-    amount: 一大塊（約 2kg）
+    amount: 一大塊（約 1.5 公斤）
   - name: 迷迭香
     amount: 1 大匙（切碎）
   - name: 百里香
@@ -16,15 +17,15 @@ ingredients:
   - name: 第戎芥末醬
     amount: 2 大匙
   - name: 洋蔥
-    amount: 1 顆
+    amount: 0.5 顆
   - name: 大蒜
     amount: 6 瓣
   - name: 白吐司
-    amount: 2 片
+    amount: 1 片
   - name: 鮮奶油
     amount: 50ml
   - name: 堅果
-    amount: 50g
+    amount: 30g
   - name: 橄欖油
     amount: 適量
   - name: 鹽
@@ -34,7 +35,7 @@ ingredients:
 draft: false
 ---
 
-## 作法
+## 🍳作法
 
 1. 去菜市場買一塊超大的豬五花肉，修掉多餘肥肉和骨頭，從肥肉和瘦肉的分界處劃開豬肉，將肉塊切成像是餐廳菜單的形狀（側面看像是一個「丄」字）。
 2. 把瘦肉像翻書一樣從中間打開，將內部每一寸肉都打上格紋形狀的花刀。

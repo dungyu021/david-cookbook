@@ -19,8 +19,10 @@ const dishes = defineCollection({
       stars: z.number().int().min(1).max(5),
       /** 標籤,自由輸入,例如 [義式, 主菜] */
       tags: z.array(z.string()).default([]),
-      /** 預估烹調時間(分鐘),用於時間範圍篩選 */
+      /** 預估烹調時間(分鐘),用於時間範圍篩選;顯示時滿 1 小時會自動換算成小時 */
       cookingTimeMinutes: z.number().int().positive(),
+      /** 幾人份,顯示在食材標題旁 */
+      servings: z.number().int().positive(),
       /** 清單頁封面照(相對路徑,例如 ./cover.jpg) */
       cover: image(),
       /** 其餘照片,詳細頁 gallery 用 */

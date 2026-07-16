@@ -22,6 +22,16 @@ const { dish } = Astro.props;
 const photos = [dish.data.cover, ...dish.data.images];
 // 食譜本文(Markdown → HTML)
 const { Content } = await render(dish);
+
+// 烹調時間顯示:滿 1 小時用「小時」當單位,不足 1 小時用「分鐘」
+// 例如 40 → 「40 分鐘」、360 → 「6 小時」、90 → 「1 小時 30 分鐘」
+const minutes = dish.data.cookingTimeMinutes;
+const cookingTimeText =
+  minutes >= 60
+    ? minutes % 60 === 0
+      ? `${minutes / 60} 小時`
+      : `${Math.floor(minutes / 60)} 小時 ${minutes % 60} 分鐘`
+    : `${minutes} 分鐘`;
 ---
 
 <BaseLayout title={`${dish.data.title}｜伏魔諭廚子`}>
@@ -98,12 +108,14 @@ const { Content } = await render(dish);
 
       {/* 烹調時間 */}
       <p class="mt-5 text-sm text-stone-500">
-        🕐 預估烹調時間：約 {dish.data.cookingTimeMinutes} 分鐘
+        🕐 預估烹調時間：約 {cookingTimeText}
       </p>
 
       {/* 食材清單 */}
       <section class="mt-8">
-        <h2 class="text-lg font-semibold">食材</h2>
+        <h2 class="text-lg font-semibold">
+          🥬食材<span class="ml-1 text-sm font-normal text-stone-500">（{dish.data.servings}人份）</span>
+        </h2>
         <ul class="mt-3 divide-y divide-stone-100 rounded-xl bg-white ring-1 ring-stone-200/60">
           {
             dish.data.ingredients.map((item) => (
