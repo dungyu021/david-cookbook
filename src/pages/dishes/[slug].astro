@@ -136,29 +136,57 @@ const photos = [dish.data.cover, ...dish.data.images];
 
 <script>
   // 照片 gallery 的箭頭按鈕:點擊捲動一張照片的寬度,
-  // 滑到最前/最後時自動隱藏對應方向的箭頭
+  // 滑到最前/最後時自動隱藏對應方向的箭頭。
+  // 按下按鈕的瞬間就以「目的地位置」判斷箭頭顯示,
+  // 所以滑向最後一張/滑回第一張時,箭頭會立刻消失,不用等動畫結束。
   const gallery = document.getElementById('gallery');
   const prev = document.getElementById('gallery-prev');
   const next = document.getElementById('gallery-next');
 
   if (gallery && prev && next) {
+    // 按鈕觸發的滑動目的地;null 代表沒有進行中的按鈕滑動
+    let target: number | null = null;
+
     const updateArrows = () => {
-      const atStart = gallery.scrollLeft <= 4;
-      const atEnd =
-        gallery.scrollLeft + gallery.clientWidth >= gallery.scrollWidth - 4;
+      // 有目的地時用目的地判斷,否則用目前實際位置
+      const pos = target ?? gallery.scrollLeft;
+      const atStart = pos <= 4;
+      const atEnd = pos + gallery.clientWidth >= gallery.scrollWidth - 4;
       prev.classList.toggle('opacity-0', atStart);
       prev.classList.toggle('pointer-events-none', atStart);
       next.classList.toggle('opacity-0', atEnd);
       next.classList.toggle('pointer-events-none', atEnd);
     };
 
-    prev.addEventListener('click', () => {
-      gallery.scrollBy({ left: -gallery.clientWidth, behavior: 'smooth' });
+    const slide = (direction: number) => {
+      const maxScroll = gallery.scrollWidth - gallery.clientWidth;
+      target = Math.max(
+        0,
+        Math.min(maxScroll, gallery.scrollLeft + direction * gallery.clientWidth),
+      );
+      updateArrows(); // 立刻依目的地更新箭頭
+      gallery.scrollTo({ left: target, behavior: 'smooth' });
+    };
+
+    prev.addEventListener('click', () => slide(-1));
+    next.addEventListener('click', () => slide(1));
+
+    gallery.addEventListener(
+      'scroll',
+      () => {
+        // 抵達目的地後解除鎖定,恢復用實際位置判斷(手指滑動也走這裡)
+        if (target !== null && Math.abs(gallery.scrollLeft - target) < 4) {
+          target = null;
+        }
+        updateArrows();
+      },
+      { passive: true },
+    );
+    // 部分瀏覽器支援 scrollend:滑動結束時保險再解除一次鎖定
+    gallery.addEventListener('scrollend', () => {
+      target = null;
+      updateArrows();
     });
-    next.addEventListener('click', () => {
-      gallery.scrollBy({ left: gallery.clientWidth, behavior: 'smooth' });
-    });
-    gallery.addEventListener('scroll', updateArrows, { passive: true });
     window.addEventListener('resize', updateArrows);
     updateArrows();
   }
