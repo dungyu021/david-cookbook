@@ -1,0 +1,43 @@
+---
+// 清單頁的料理卡片:封面照、菜名、星等、標籤
+import { Image } from 'astro:assets';
+import type { CollectionEntry } from 'astro:content';
+import StarRating from './StarRating.astro';
+
+interface Props {
+  dish: CollectionEntry<'dishes'>;
+}
+
+const { dish } = Astro.props;
+// id 格式為 "lemon-butter-pasta/zh",取斜線前的部分當網址 slug
+const slug = dish.id.split('/')[0];
+---
+
+<a
+  href={`/dishes/${slug}/`}
+  class="group block overflow-hidden rounded-2xl bg-white shadow-sm ring-1 ring-stone-200/60 transition hover:shadow-md"
+>
+  <div class="aspect-[4/3] overflow-hidden bg-stone-100">
+    <Image
+      src={dish.data.cover}
+      alt={dish.data.title}
+      widths={[400, 800]}
+      sizes="(min-width: 640px) 50vw, 100vw"
+      class="h-full w-full object-cover transition duration-300 group-hover:scale-[1.03]"
+      loading="lazy"
+    />
+  </div>
+  <div class="flex flex-col gap-2 p-4">
+    <h2 class="text-lg font-semibold leading-snug">{dish.data.title}</h2>
+    <StarRating stars={dish.data.stars} />
+    <ul class="flex flex-wrap gap-1.5">
+      {
+        dish.data.tags.map((tag) => (
+          <li class="rounded-full bg-stone-100 px-2.5 py-0.5 text-xs text-stone-600">
+            #{tag}
+          </li>
+        ))
+      }
+    </ul>
+  </div>
+</a>

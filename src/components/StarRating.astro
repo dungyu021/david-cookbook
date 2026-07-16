@@ -1,0 +1,26 @@
+---
+// 星等顯示元件:視覺化 1–5 顆星,例如 ★★★★☆
+interface Props {
+  stars: number;
+}
+
+const { stars } = Astro.props;
+const MAX = 5;
+---
+
+<span
+  class="inline-flex items-center gap-0.5"
+  role="img"
+  aria-label={`${stars} 顆星(滿分 ${MAX} 顆)`}
+>
+  {
+    Array.from({ length: MAX }, (_, i) => (
+      <span
+        aria-hidden="true"
+        class={i < stars ? 'text-amber-500' : 'text-stone-300'}
+      >
+        ★
+      </span>
+    ))
+  }
+</span>
