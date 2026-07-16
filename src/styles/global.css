@@ -1,0 +1,16 @@
+/* 全站樣式進入點:載入 Tailwind CSS */
+@import 'tailwindcss';
+
+/* 全站基礎設定 */
+@layer base {
+  html {
+    /* 繁中優先的系統字型堆疊:不用下載字型檔,載入最快 */
+    font-family:
+      system-ui,
+      -apple-system,
+      'PingFang TC',
+      'Noto Sans TC',
+      'Microsoft JhengHei',
+      sans-serif;
+  }
+}

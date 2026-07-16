@@ -1,0 +1,33 @@
+---
+// 全站共用的基礎版型:每個頁面都包在這個 Layout 裡
+// 負責 <head> 的 meta 標籤、語言宣告、全域樣式
+import '../styles/global.css';
+
+interface Props {
+  /** 頁面標題(會顯示在瀏覽器分頁上) */
+  title: string;
+  /** 頁面描述(給搜尋引擎與社群分享用) */
+  description?: string;
+  /** 頁面語言,預設繁體中文 */
+  lang?: string;
+}
+
+const {
+  title,
+  description = 'David 的個人料理作品集',
+  lang = 'zh-Hant',
+} = Astro.props;
+---
+
+<!doctype html>
+<html lang={lang}>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content={description} />
+    <title>{title}</title>
+  </head>
+  <body class="min-h-screen bg-stone-50 text-stone-900 antialiased">
+    <slot />
+  </body>
+</html>

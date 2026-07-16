@@ -1,0 +1,14 @@
+# 建置產物
+dist/
+.astro/
+
+# 依賴套件
+node_modules/
+
+# 環境變數(內含食譜密碼,絕不能 commit)
+.env
+.env.production
+
+# 系統雜項
+.DS_Store
+npm-debug.log*
