@@ -135,7 +135,17 @@ draft: false              # true 時不會出現在網站上
 3. 對 Claude Code 說「翻譯這道菜」→ Claude Code 讀取 `zh.md`,產生 `en.md` 與 `it.md`。翻譯時:菜名可意譯(讓外國人看得懂),食材用當地慣用說法,義大利菜名優先使用義大利文原名。
 4. `git push` → Cloudflare Pages 自動部署。
 
-**建議建立一個 `npm run new-dish` script(或 Claude Code slash command)**,互動式產生新料理的資料夾與 zh.md 模板,降低手動出錯。
+已建立 `/new-dish` slash command(`.claude/commands/new-dish.md`):David 貼上食譜文字即可,Claude Code 會處理照片、撰寫 zh.md、build 驗證。
+
+### 內容慣例(所有對話都必須遵守)
+
+- **標點**:網站上所有中文一律全形標點(,。()!:),唯 hashtag 的 `#` 維持半形。
+- **食譜本文標題**:「## 🍳 作法」(emoji 後有空格);詳細頁模板會自動顯示「🥬 食材(N人份)」。
+- **照片**:封面命名 `cover.jpg`,其餘 `photo-2.jpg`、`photo-3.jpg`…;iPhone 照片一律先用 sharp 重新輸出**清除 EXIF/GPS 隱私資訊**再 commit;HEIC 要提醒轉檔。
+- **照片未到位的新料理**:先用佔位圖 + `draft: true`,照片到位後再切 `draft: false`。
+- **日期**:`date` 以「製作這道菜的日期」為準,不是上架日。
+- **Commit**:由 David 自己執行 commit & push,Claude Code 只提供指令(conventional commits 格式);不加 Claude 署名(已由 `.claude/settings.json` 設定)。
+- **8GB RAM 注意**:build 異常變慢時先查 `sysctl vm.swapusage`,通常是 Chrome 吃光記憶體,不是程式問題。
 
 ## 開發階段
 
