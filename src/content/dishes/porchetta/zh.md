@@ -1,5 +1,5 @@
 ---
-title: 義大利脆皮豬肉捲 Porchetta
+title: 義式脆皮豬肉捲 Porchetta
 date: 2023-12-23
 stars: 3
 tags: [義式, 主菜]
