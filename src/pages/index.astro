@@ -2,8 +2,10 @@
 // 首頁:料理清單(繁體中文版)
 // Phase 2 會在這裡加上篩選與排序面板(React island)
 import { getCollection } from 'astro:content';
+import { Image } from 'astro:assets';
 import BaseLayout from '../layouts/BaseLayout.astro';
 import DishCard from '../components/DishCard.astro';
+import logo from '../assets/logo.jpg';
 
 // 只取繁中版(zh.md)且非草稿的料理,預設最新在前
 const dishes = (
@@ -11,10 +13,18 @@ const dishes = (
 ).sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
 ---
 
-<BaseLayout title="David 的料理菜單">
+<BaseLayout title="伏魔御廚子">
   <main class="mx-auto max-w-5xl px-4 py-8 sm:px-6">
-    <header class="mb-8">
-      <h1 class="text-3xl font-bold tracking-tight">David 的料理菜單</h1>
+    <header class="mb-8 flex flex-col items-center text-center">
+      <Image
+        src={logo}
+        alt="伏魔御廚子 Logo:額上有符印的黑貓"
+        widths={[160, 320]}
+        sizes="112px"
+        class="h-28 w-28 rounded-full object-cover ring-1 ring-stone-200"
+        loading="eager"
+      />
+      <h1 class="mt-4 text-3xl font-bold tracking-tight">伏魔御廚子</h1>
       <p class="mt-2 text-stone-500">做過的每一道菜,都在這裡。</p>
     </header>
 
