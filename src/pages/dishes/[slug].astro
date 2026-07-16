@@ -24,9 +24,9 @@ const photos = [dish.data.cover, ...dish.data.images];
 const { Content } = await render(dish);
 ---
 
-<BaseLayout title={`${dish.data.title}|伏魔諭廚子`}>
+<BaseLayout title={`${dish.data.title}｜伏魔諭廚子`}>
   <main class="mx-auto max-w-2xl pb-16">
-    <!-- 照片 gallery:手機上左右滑動(CSS scroll-snap),另有半透明箭頭按鈕提示可以翻頁 -->
+    {/* 照片 gallery:手機上左右滑動(CSS scroll-snap),另有半透明箭頭按鈕提示可以翻頁 */}
     <div class="relative">
       <div
         id="gallery"
@@ -77,7 +77,7 @@ const { Content } = await render(dish);
     </div>
 
     <div class="px-4 sm:px-6">
-      <!-- 菜名、星等、標籤 -->
+      {/* 菜名、星等、標籤 */}
       <header class="mt-6">
         <h1 class="text-2xl font-bold tracking-tight sm:text-3xl">
           {dish.data.title}
@@ -96,12 +96,12 @@ const { Content } = await render(dish);
         </ul>
       </header>
 
-      <!-- 烹調時間 -->
+      {/* 烹調時間 */}
       <p class="mt-5 text-sm text-stone-500">
-        🕐 預估烹調時間:約 {dish.data.cookingTimeMinutes} 分鐘
+        🕐 預估烹調時間：約 {dish.data.cookingTimeMinutes} 分鐘
       </p>
 
-      <!-- 食材清單 -->
+      {/* 食材清單 */}
       <section class="mt-8">
         <h2 class="text-lg font-semibold">食材</h2>
         <ul class="mt-3 divide-y divide-stone-100 rounded-xl bg-white ring-1 ring-stone-200/60">
@@ -116,7 +116,7 @@ const { Content } = await render(dish);
         </ul>
       </section>
 
-      <!-- 完整食譜本文(公開顯示) -->
+      {/* 完整食譜本文(公開顯示) */}
       <section class="mt-8">
         <div class="prose prose-stone mt-3 max-w-none prose-headings:text-lg">
           <Content />
