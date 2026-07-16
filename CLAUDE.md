@@ -47,7 +47,7 @@ date: 2026-07-15          # 上架日期,用於「最新」排序
 stars: 5                  # 1–5,David 的個人喜好/推薦程度
 tags: [義式, 主菜, 義大利麵]   # 多重標籤,自由輸入
 cookingTimeMinutes: 30    # 預估烹調時間(分鐘),用於時間範圍篩選;顯示時滿 1 小時自動換算為小時
-servings: 2               # 幾人份,顯示在詳細頁「🥬食材」標題旁
+servings: 2               # 幾人份,顯示在詳細頁「🥬 食材」標題旁
 cover: ./cover.jpg
 images: [./photo-2.jpg, ./photo-3.jpg]
 ingredients:              # 完整食材清單(含份量),用於「包含/排除食材」篩選
