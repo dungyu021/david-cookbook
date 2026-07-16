@@ -21,7 +21,7 @@ ingredients:
   - name: 培根
     amount: 2 片
   - name: 起司絲
-    amount: 適量（致死量）
+    amount: 適量
   - name: 鮮奶油
     amount: 適量（可省略）
   - name: 肉桂粉
