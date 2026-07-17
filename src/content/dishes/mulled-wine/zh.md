@@ -6,6 +6,7 @@ tags: [飲品, 甜點]
 cookingTimeMinutes: 30
 servings: 4
 cover: ./cover.jpg
+images: [./photo-2.jpg]
 ingredients:
   - name: 紅酒
     amount: 1瓶
