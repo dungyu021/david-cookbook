@@ -11,6 +11,9 @@ interface Props {
 const { dish } = Astro.props;
 // id 格式為 "lemon-butter-pasta/zh",取斜線前的部分當網址 slug
 const slug = dish.id.split('/')[0];
+// 用 UTC 取值,避免因 build 主機時區不同導致日期跑掉
+const d = dish.data.date;
+const dateText = `${d.getUTCFullYear()}年${d.getUTCMonth() + 1}月${d.getUTCDate()}日`;
 ---
 
 <a
@@ -39,5 +42,6 @@ const slug = dish.id.split('/')[0];
         ))
       }
     </ul>
+    <p class="text-xs text-stone-500">日期：{dateText}</p>
   </div>
 </a>
