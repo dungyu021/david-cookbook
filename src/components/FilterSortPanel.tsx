@@ -6,7 +6,7 @@
 // 響應式布局:手機是底部彈出的 bottom sheet(lg:hidden),
 // 桌面是常駐側欄(hidden lg:block)。兩者共用同一份 state,
 // 篩選控制項的 JSX(filterControls)在兩邊各渲染一份,操作任一邊都會同步。
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState, type ReactNode } from 'react';
 import {
   CATEGORY_LABELS,
   CATEGORY_ORDER,
@@ -64,6 +64,37 @@ function groupIngredients(names: string[]) {
   }));
 }
 
+// 「想吃/不吃」整區塊的下拉開關:按下標題才展開所有大類別
+function CollapsibleSection({
+  title,
+  count,
+  children,
+}: {
+  title: string;
+  count: number;
+  children: ReactNode;
+}) {
+  const [open, setOpen] = useState(false);
+  return (
+    <section className="mb-5">
+      <button
+        type="button"
+        onClick={() => setOpen((v) => !v)}
+        className="flex w-full items-center justify-between rounded-lg border border-stone-200 px-3 py-2 text-sm font-medium text-stone-700"
+      >
+        <span>
+          {title}
+          {count > 0 ? `（已選 ${count}）` : ''}
+        </span>
+        <span className={`text-stone-400 transition-transform ${open ? 'rotate-180' : ''}`}>⌄</span>
+      </button>
+      {open && <div className="mt-3">{children}</div>}
+    </section>
+  );
+}
+
+// 大類別本身也是下拉式:按類別旁的箭頭才展開細項,
+// 按類別名稱本身則是「一次勾選/取消整個大類別」。
 function IngredientGroupPicker({
   groups,
   selected,
@@ -75,40 +106,113 @@ function IngredientGroupPicker({
   onToggleItem: (item: string) => void;
   onToggleCategory: (items: string[]) => void;
 }) {
+  const [expanded, setExpanded] = useState<Set<CategoryKey>>(new Set());
+  const toggleExpanded = (key: CategoryKey) => {
+    setExpanded((prev) => {
+      const next = new Set(prev);
+      if (next.has(key)) next.delete(key);
+      else next.add(key);
+      return next;
+    });
+  };
+
   return (
-    <div className="space-y-3">
+    <div className="space-y-2">
       {groups.map((group) => {
         const allSelected = group.items.every((item) => selected.includes(item));
+        const someSelected = !allSelected && group.items.some((item) => selected.includes(item));
+        const isExpanded = expanded.has(group.key);
         return (
           <div key={group.key}>
-            <button
-              type="button"
-              onClick={() => onToggleCategory(group.items)}
-              className={`mb-1.5 rounded-full px-2.5 py-0.5 text-xs font-medium transition ${
-                allSelected ? 'bg-stone-700 text-white' : 'bg-stone-200 text-stone-700'
-              }`}
-            >
-              {group.label}
-            </button>
-            <div className="flex flex-wrap gap-1.5">
-              {group.items.map((item) => (
-                <button
-                  key={item}
-                  type="button"
-                  onClick={() => onToggleItem(item)}
-                  className={`rounded-full px-2.5 py-1 text-xs transition ${
-                    selected.includes(item)
-                      ? 'bg-amber-500 text-white'
-                      : 'bg-stone-100 text-stone-600'
-                  }`}
-                >
-                  {item}
-                </button>
-              ))}
+            <div className="flex items-center gap-1.5">
+              <button
+                type="button"
+                onClick={() => onToggleCategory(group.items)}
+                className={`rounded-full px-2.5 py-0.5 text-xs font-medium transition ${
+                  allSelected
+                    ? 'bg-stone-700 text-white'
+                    : someSelected
+                      ? 'bg-stone-400 text-white'
+                      : 'bg-stone-200 text-stone-700'
+                }`}
+              >
+                {group.label}
+              </button>
+              <button
+                type="button"
+                onClick={() => toggleExpanded(group.key)}
+                aria-label={isExpanded ? `收合${group.label}細項` : `展開${group.label}細項`}
+                className="px-1 text-xs text-stone-400"
+              >
+                <span className={`inline-block transition-transform ${isExpanded ? 'rotate-180' : ''}`}>
+                  ⌄
+                </span>
+              </button>
             </div>
+            {isExpanded && (
+              <div className="mt-1.5 flex flex-wrap gap-1.5 pl-1">
+                {group.items.map((item) => (
+                  <button
+                    key={item}
+                    type="button"
+                    onClick={() => onToggleItem(item)}
+                    className={`rounded-full px-2.5 py-1 text-xs transition ${
+                      selected.includes(item)
+                        ? 'bg-amber-500 text-white'
+                        : 'bg-stone-100 text-stone-600'
+                    }`}
+                  >
+                    {item}
+                  </button>
+                ))}
+              </div>
+            )}
           </div>
         );
       })}
+    </div>
+  );
+}
+
+// 標籤預設只顯示前 TAG_PREVIEW_COUNT 個(約兩排),其餘收在「顯示更多」後面
+const TAG_PREVIEW_COUNT = 8;
+
+function TagPicker({
+  tags,
+  selected,
+  onToggle,
+}: {
+  tags: string[];
+  selected: string[];
+  onToggle: (tag: string) => void;
+}) {
+  const [showAll, setShowAll] = useState(false);
+  const visibleTags = showAll ? tags : tags.slice(0, TAG_PREVIEW_COUNT);
+  const hasMore = tags.length > TAG_PREVIEW_COUNT;
+
+  return (
+    <div className="flex flex-wrap gap-2">
+      {visibleTags.map((tag) => (
+        <button
+          key={tag}
+          type="button"
+          onClick={() => onToggle(tag)}
+          className={`rounded-full px-3 py-1 text-xs transition ${
+            selected.includes(tag) ? 'bg-amber-500 text-white' : 'bg-stone-100 text-stone-600'
+          }`}
+        >
+          #{tag}
+        </button>
+      ))}
+      {hasMore && (
+        <button
+          type="button"
+          onClick={() => setShowAll((v) => !v)}
+          className="rounded-full px-3 py-1 text-xs text-stone-500 underline underline-offset-2"
+        >
+          {showAll ? '收合' : `顯示更多（${tags.length - TAG_PREVIEW_COUNT}）`}
+        </button>
+      )}
     </div>
   );
 }
@@ -329,41 +433,26 @@ export default function FilterSortPanel({ dishes }: Props) {
     <>
       <section className="mb-5">
         <h3 className="mb-2 text-sm font-medium text-stone-700">標籤</h3>
-        <div className="flex flex-wrap gap-2">
-          {allTags.map((tag) => (
-            <button
-              key={tag}
-              type="button"
-              onClick={() => toggleTag(tag)}
-              className={`rounded-full px-3 py-1 text-xs transition ${
-                selectedTags.includes(tag) ? 'bg-amber-500 text-white' : 'bg-stone-100 text-stone-600'
-              }`}
-            >
-              #{tag}
-            </button>
-          ))}
-        </div>
+        <TagPicker tags={allTags} selected={selectedTags} onToggle={toggleTag} />
       </section>
 
-      <section className="mb-5">
-        <h3 className="mb-2 text-sm font-medium text-stone-700">包含食材</h3>
+      <CollapsibleSection title="想吃..." count={includeIngredients.length}>
         <IngredientGroupPicker
           groups={ingredientGroups}
           selected={includeIngredients}
           onToggleItem={toggleIncludeItem}
           onToggleCategory={toggleIncludeCategory}
         />
-      </section>
+      </CollapsibleSection>
 
-      <section className="mb-5">
-        <h3 className="mb-2 text-sm font-medium text-stone-700">排除食材</h3>
+      <CollapsibleSection title="不吃..." count={excludeIngredients.length}>
         <IngredientGroupPicker
           groups={ingredientGroups}
           selected={excludeIngredients}
           onToggleItem={toggleExcludeItem}
           onToggleCategory={toggleExcludeCategory}
         />
-      </section>
+      </CollapsibleSection>
 
       <section className="mb-2">
         <h3 className="mb-3 text-sm font-medium text-stone-700">
