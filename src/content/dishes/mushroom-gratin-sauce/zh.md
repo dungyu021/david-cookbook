@@ -2,7 +2,7 @@
 title: 西堤蘑菇焗烤醬
 date: 2024-04-15
 stars: 4
-tags: [西式, 醬料]
+tags: [法式, 醬料]
 cookingTimeMinutes: 30
 servings: 4
 cover: ./cover.jpg
