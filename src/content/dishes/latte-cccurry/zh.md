@@ -1,5 +1,5 @@
 ---
-title: 拿鐵咖咖咖哩 Latte CCCurry
+title: 拿鐵咖咖咖哩
 date: 2025-04-12
 stars: 5
 tags: [日式, 主菜]
