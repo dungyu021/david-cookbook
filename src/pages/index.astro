@@ -1,21 +1,31 @@
 ---
 // 首頁:料理清單(繁體中文版)
-// Phase 2 會在這裡加上篩選與排序面板(React island)
 import { getCollection } from 'astro:content';
 import { Image } from 'astro:assets';
 import BaseLayout from '../layouts/BaseLayout.astro';
 import DishCard from '../components/DishCard.astro';
+import FilterSortPanel from '../components/FilterSortPanel';
 import logo from '../assets/logo.jpg';
 
 // 只取繁中版(zh.md)且非草稿的料理,預設最新在前
 const dishes = (
   await getCollection('dishes', (d) => d.id.endsWith('/zh') && !d.data.draft)
 ).sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
+
+// 給 React 篩選面板用的輕量索引(不含圖片,圖片仍由 Astro 的 DishCard 處理)
+const dishIndex = dishes.map((dish) => ({
+  slug: dish.id.split('/')[0],
+  stars: dish.data.stars,
+  tags: dish.data.tags,
+  cookingTimeMinutes: dish.data.cookingTimeMinutes,
+  ingredients: dish.data.ingredients.map((i) => i.name),
+  date: dish.data.date.valueOf(),
+}));
 ---
 
 <BaseLayout title="伏魔諭廚子">
-  <main class="mx-auto max-w-5xl px-4 py-8 sm:px-6">
-    <header class="mb-8 flex flex-col items-center text-center">
+  <div class="bg-[#fff9d9]">
+    <header class="mx-auto flex max-w-5xl flex-col items-center px-4 py-8 text-center sm:px-6">
       <Image
         src={logo}
         alt="伏魔諭廚子 Logo：額上有符印的黑貓"
@@ -27,9 +37,17 @@ const dishes = (
       <h1 class="mt-4 text-3xl font-bold tracking-tight">伏魔諭廚子</h1>
       <p class="mt-2 text-stone-500">持續更新料理中✍️</p>
     </header>
+  </div>
 
-    <div class="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
-      {dishes.map((dish) => <DishCard dish={dish} />)}
+  <main class="mx-auto max-w-6xl px-4 py-8 sm:px-6">
+    <div class="lg:flex lg:items-start lg:gap-8">
+      <FilterSortPanel client:load dishes={dishIndex} />
+
+      <div class="min-w-0 flex-1">
+        <div id="dish-grid" class="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3">
+          {dishes.map((dish) => <DishCard dish={dish} />)}
+        </div>
+      </div>
     </div>
   </main>
 </BaseLayout>
