@@ -7,6 +7,13 @@
 // 桌面是常駐側欄(hidden lg:block)。兩者共用同一份 state,
 // 篩選控制項的 JSX(filterControls)在兩邊各渲染一份,操作任一邊都會同步。
 import { useEffect, useMemo, useState } from 'react';
+import {
+  CATEGORY_LABELS,
+  CATEGORY_ORDER,
+  categoryOf,
+  normalizeIngredientName,
+  type CategoryKey,
+} from '../data/ingredientCategories';
 
 interface DishIndexItem {
   slug: string;
@@ -23,12 +30,15 @@ interface Props {
 
 type SortKey = 'date-desc' | 'date-asc' | 'stars-desc';
 
+const TIME_STEP = 5;
+const TIME_MIN_GAP = 10;
+
 function readParams() {
   const params = new URLSearchParams(window.location.search);
   return {
     tags: params.get('tags')?.split(',').filter(Boolean) ?? [],
-    include: params.get('include') ?? '',
-    exclude: params.get('exclude') ?? '',
+    include: params.get('include')?.split(',').filter(Boolean) ?? [],
+    exclude: params.get('exclude')?.split(',').filter(Boolean) ?? [],
     min: params.get('min'),
     max: params.get('max'),
     sort: (params.get('sort') as SortKey) || 'date-desc',
@@ -39,22 +49,157 @@ function cookingTimeText(minutes: number) {
   return minutes >= 60 ? `${Math.round((minutes / 60) * 10) / 10}小時` : `${minutes}分鐘`;
 }
 
+// 依大類別分組的食材選單(包含食材/排除食材共用同一份分組資料)
+function groupIngredients(names: string[]) {
+  const byCategory = new Map<CategoryKey, string[]>();
+  for (const name of names) {
+    const cat = categoryOf(name);
+    if (!byCategory.has(cat)) byCategory.set(cat, []);
+    byCategory.get(cat)!.push(name);
+  }
+  return CATEGORY_ORDER.filter((cat) => byCategory.has(cat)).map((cat) => ({
+    key: cat,
+    label: CATEGORY_LABELS[cat],
+    items: byCategory.get(cat)!.sort(),
+  }));
+}
+
+function IngredientGroupPicker({
+  groups,
+  selected,
+  onToggleItem,
+  onToggleCategory,
+}: {
+  groups: { key: CategoryKey; label: string; items: string[] }[];
+  selected: string[];
+  onToggleItem: (item: string) => void;
+  onToggleCategory: (items: string[]) => void;
+}) {
+  return (
+    <div className="space-y-3">
+      {groups.map((group) => {
+        const allSelected = group.items.every((item) => selected.includes(item));
+        return (
+          <div key={group.key}>
+            <button
+              type="button"
+              onClick={() => onToggleCategory(group.items)}
+              className={`mb-1.5 rounded-full px-2.5 py-0.5 text-xs font-medium transition ${
+                allSelected ? 'bg-stone-700 text-white' : 'bg-stone-200 text-stone-700'
+              }`}
+            >
+              {group.label}
+            </button>
+            <div className="flex flex-wrap gap-1.5">
+              {group.items.map((item) => (
+                <button
+                  key={item}
+                  type="button"
+                  onClick={() => onToggleItem(item)}
+                  className={`rounded-full px-2.5 py-1 text-xs transition ${
+                    selected.includes(item)
+                      ? 'bg-amber-500 text-white'
+                      : 'bg-stone-100 text-stone-600'
+                  }`}
+                >
+                  {item}
+                </button>
+              ))}
+            </div>
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
+// 烹調時間雙向滑桿:同一條軌道、兩個把手,把手間至少間隔 TIME_MIN_GAP 分鐘
+function TimeRangeSlider({
+  min,
+  max,
+  value,
+  onChange,
+}: {
+  min: number;
+  max: number;
+  value: [number, number];
+  onChange: (next: [number, number]) => void;
+}) {
+  const [lo, hi] = value;
+  const percent = (v: number) => ((v - min) / (max - min || 1)) * 100;
+
+  return (
+    <div className="relative h-5">
+      <div className="absolute top-1/2 h-1.5 w-full -translate-y-1/2 rounded-full bg-stone-200" />
+      <div
+        className="absolute top-1/2 h-1.5 -translate-y-1/2 rounded-full bg-amber-500"
+        style={{ left: `${percent(lo)}%`, right: `${100 - percent(hi)}%` }}
+      />
+      <input
+        type="range"
+        aria-label="最短烹調時間"
+        min={min}
+        max={max}
+        step={TIME_STEP}
+        value={lo}
+        onChange={(e) => {
+          const next = Math.min(Number(e.target.value), hi - TIME_MIN_GAP);
+          onChange([Math.max(min, next), hi]);
+        }}
+        className="range-thumb absolute inset-0 z-20 w-full cursor-pointer appearance-none bg-transparent"
+      />
+      <input
+        type="range"
+        aria-label="最長烹調時間"
+        min={min}
+        max={max}
+        step={TIME_STEP}
+        value={hi}
+        onChange={(e) => {
+          const next = Math.max(Number(e.target.value), lo + TIME_MIN_GAP);
+          onChange([lo, Math.min(max, next)]);
+        }}
+        className="range-thumb absolute inset-0 z-10 w-full cursor-pointer appearance-none bg-transparent"
+      />
+    </div>
+  );
+}
+
 export default function FilterSortPanel({ dishes }: Props) {
-  const allTags = useMemo(() => Array.from(new Set(dishes.flatMap((d) => d.tags))).sort(), [dishes]);
-  const allIngredients = useMemo(
-    () => Array.from(new Set(dishes.flatMap((d) => d.ingredients))).sort(),
+  // 把每道菜的食材正規化(去括號、合併同義詞、排除調味料),供篩選使用
+  const normalizedDishes = useMemo(
+    () =>
+      dishes.map((d) => ({
+        ...d,
+        ingredients: Array.from(
+          new Set(
+            d.ingredients
+              .map((name) => normalizeIngredientName(name))
+              .filter((name): name is string => name !== null),
+          ),
+        ),
+      })),
     [dishes],
   );
+
+  const allIngredients = useMemo(
+    () => Array.from(new Set(normalizedDishes.flatMap((d) => d.ingredients))),
+    [normalizedDishes],
+  );
+  const ingredientGroups = useMemo(() => groupIngredients(allIngredients), [allIngredients]);
+
+  const allTags = useMemo(() => Array.from(new Set(dishes.flatMap((d) => d.tags))).sort(), [dishes]);
   const timeBounds = useMemo(() => {
     const times = dishes.map((d) => d.cookingTimeMinutes);
     return { min: Math.min(...times), max: Math.max(...times) };
   }, [dishes]);
 
   const [open, setOpen] = useState(false);
+  const [shown, setShown] = useState(false);
   const [ready, setReady] = useState(false);
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
-  const [includeIngredient, setIncludeIngredient] = useState('');
-  const [excludeIngredient, setExcludeIngredient] = useState('');
+  const [includeIngredients, setIncludeIngredients] = useState<string[]>([]);
+  const [excludeIngredients, setExcludeIngredients] = useState<string[]>([]);
   const [timeRange, setTimeRange] = useState<[number, number]>([timeBounds.min, timeBounds.max]);
   const [sort, setSort] = useState<SortKey>('date-desc');
 
@@ -62,8 +207,8 @@ export default function FilterSortPanel({ dishes }: Props) {
   useEffect(() => {
     const p = readParams();
     setSelectedTags(p.tags);
-    setIncludeIngredient(p.include);
-    setExcludeIngredient(p.exclude);
+    setIncludeIngredients(p.include);
+    setExcludeIngredients(p.exclude);
     setTimeRange([
       p.min !== null ? Number(p.min) : timeBounds.min,
       p.max !== null ? Number(p.max) : timeBounds.max,
@@ -74,16 +219,32 @@ export default function FilterSortPanel({ dishes }: Props) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  // 打開 bottom sheet 時,下一個 frame 才加上動畫 class,才能觸發「從下滑上來」的 CSS transition
+  useEffect(() => {
+    if (open) {
+      const id = requestAnimationFrame(() => setShown(true));
+      return () => cancelAnimationFrame(id);
+    }
+  }, [open]);
+
+  const openSheet = () => setOpen(true);
+  const closeSheet = () => {
+    setShown(false);
+    window.setTimeout(() => setOpen(false), 400);
+  };
+
   const filtered = useMemo(
     () =>
-      dishes.filter((d) => {
+      normalizedDishes.filter((d) => {
         if (selectedTags.length > 0 && !selectedTags.every((t) => d.tags.includes(t))) return false;
-        if (includeIngredient && !d.ingredients.includes(includeIngredient)) return false;
-        if (excludeIngredient && d.ingredients.includes(excludeIngredient)) return false;
+        if (includeIngredients.length > 0 && !includeIngredients.some((ing) => d.ingredients.includes(ing)))
+          return false;
+        if (excludeIngredients.length > 0 && excludeIngredients.some((ing) => d.ingredients.includes(ing)))
+          return false;
         if (d.cookingTimeMinutes < timeRange[0] || d.cookingTimeMinutes > timeRange[1]) return false;
         return true;
       }),
-    [dishes, selectedTags, includeIngredient, excludeIngredient, timeRange],
+    [normalizedDishes, selectedTags, includeIngredients, excludeIngredients, timeRange],
   );
 
   const sorted = useMemo(() => {
@@ -102,8 +263,8 @@ export default function FilterSortPanel({ dishes }: Props) {
 
     const params = new URLSearchParams();
     if (selectedTags.length) params.set('tags', selectedTags.join(','));
-    if (includeIngredient) params.set('include', includeIngredient);
-    if (excludeIngredient) params.set('exclude', excludeIngredient);
+    if (includeIngredients.length) params.set('include', includeIngredients.join(','));
+    if (excludeIngredients.length) params.set('exclude', excludeIngredients.join(','));
     if (timeRange[0] !== timeBounds.min) params.set('min', String(timeRange[0]));
     if (timeRange[1] !== timeBounds.max) params.set('max', String(timeRange[1]));
     if (sort !== 'date-desc') params.set('sort', sort);
@@ -121,21 +282,36 @@ export default function FilterSortPanel({ dishes }: Props) {
     grid.querySelectorAll<HTMLElement>('[data-slug]').forEach((el) => {
       el.classList.toggle('hidden', !visibleSlugs.has(el.dataset.slug!));
     });
-  }, [ready, sorted, selectedTags, includeIngredient, excludeIngredient, timeRange, sort, timeBounds]);
+  }, [ready, sorted, selectedTags, includeIngredients, excludeIngredients, timeRange, sort, timeBounds]);
 
   const toggleTag = (tag: string) => {
     setSelectedTags((prev) => (prev.includes(tag) ? prev.filter((t) => t !== tag) : [...prev, tag]));
   };
 
+  const makeToggleItem = (setter: (fn: (prev: string[]) => string[]) => void) => (item: string) =>
+    setter((prev) => (prev.includes(item) ? prev.filter((i) => i !== item) : [...prev, item]));
+
+  const makeToggleCategory = (setter: (fn: (prev: string[]) => string[]) => void) => (items: string[]) =>
+    setter((prev) => {
+      const allSelected = items.every((i) => prev.includes(i));
+      if (allSelected) return prev.filter((i) => !items.includes(i));
+      return Array.from(new Set([...prev, ...items]));
+    });
+
+  const toggleIncludeItem = makeToggleItem(setIncludeIngredients);
+  const toggleIncludeCategory = makeToggleCategory(setIncludeIngredients);
+  const toggleExcludeItem = makeToggleItem(setExcludeIngredients);
+  const toggleExcludeCategory = makeToggleCategory(setExcludeIngredients);
+
   const resetFilters = () => {
     setSelectedTags([]);
-    setIncludeIngredient('');
-    setExcludeIngredient('');
+    setIncludeIngredients([]);
+    setExcludeIngredients([]);
     setTimeRange([timeBounds.min, timeBounds.max]);
   };
 
   const activeCount =
-    selectedTags.length + (includeIngredient ? 1 : 0) + (excludeIngredient ? 1 : 0);
+    selectedTags.length + includeIngredients.length + excludeIngredients.length;
 
   const sortSelect = (
     <select
@@ -171,58 +347,29 @@ export default function FilterSortPanel({ dishes }: Props) {
 
       <section className="mb-5">
         <h3 className="mb-2 text-sm font-medium text-stone-700">包含食材</h3>
-        <select
-          value={includeIngredient}
-          onChange={(e) => setIncludeIngredient(e.target.value)}
-          className="w-full rounded-lg border border-stone-300 px-3 py-2 text-sm"
-        >
-          <option value="">不限</option>
-          {allIngredients.map((ing) => (
-            <option key={ing} value={ing}>
-              {ing}
-            </option>
-          ))}
-        </select>
+        <IngredientGroupPicker
+          groups={ingredientGroups}
+          selected={includeIngredients}
+          onToggleItem={toggleIncludeItem}
+          onToggleCategory={toggleIncludeCategory}
+        />
       </section>
 
       <section className="mb-5">
         <h3 className="mb-2 text-sm font-medium text-stone-700">排除食材</h3>
-        <select
-          value={excludeIngredient}
-          onChange={(e) => setExcludeIngredient(e.target.value)}
-          className="w-full rounded-lg border border-stone-300 px-3 py-2 text-sm"
-        >
-          <option value="">不限</option>
-          {allIngredients.map((ing) => (
-            <option key={ing} value={ing}>
-              {ing}
-            </option>
-          ))}
-        </select>
+        <IngredientGroupPicker
+          groups={ingredientGroups}
+          selected={excludeIngredients}
+          onToggleItem={toggleExcludeItem}
+          onToggleCategory={toggleExcludeCategory}
+        />
       </section>
 
       <section className="mb-2">
-        <h3 className="mb-2 text-sm font-medium text-stone-700">
+        <h3 className="mb-3 text-sm font-medium text-stone-700">
           烹調時間：{cookingTimeText(timeRange[0])} – {cookingTimeText(timeRange[1])}
         </h3>
-        <div className="space-y-2">
-          <input
-            type="range"
-            min={timeBounds.min}
-            max={timeBounds.max}
-            value={timeRange[0]}
-            onChange={(e) => setTimeRange([Math.min(Number(e.target.value), timeRange[1]), timeRange[1]])}
-            className="w-full accent-amber-500"
-          />
-          <input
-            type="range"
-            min={timeBounds.min}
-            max={timeBounds.max}
-            value={timeRange[1]}
-            onChange={(e) => setTimeRange([timeRange[0], Math.max(Number(e.target.value), timeRange[0])])}
-            className="w-full accent-amber-500"
-          />
-        </div>
+        <TimeRangeSlider min={timeBounds.min} max={timeBounds.max} value={timeRange} onChange={setTimeRange} />
       </section>
     </>
   );
@@ -234,7 +381,7 @@ export default function FilterSortPanel({ dishes }: Props) {
         <div className="flex flex-wrap items-center justify-between gap-3">
           <button
             type="button"
-            onClick={() => setOpen(true)}
+            onClick={openSheet}
             className="rounded-full border border-stone-300 bg-white px-4 py-2 text-sm font-medium text-stone-700 shadow-sm"
           >
             🔍 篩選{activeCount > 0 ? `（${activeCount}）` : ''}
@@ -247,13 +394,22 @@ export default function FilterSortPanel({ dishes }: Props) {
       {/* 手機版:從下滑出的篩選面板(bottom sheet) */}
       {open && (
         <div className="fixed inset-0 z-50 flex items-end justify-center lg:hidden">
-          <div className="absolute inset-0 bg-black/40" onClick={() => setOpen(false)} />
-          <div className="relative z-10 max-h-[85vh] w-full overflow-y-auto rounded-t-2xl bg-white p-5 shadow-xl">
+          <div
+            onClick={closeSheet}
+            className={`absolute inset-0 bg-black/40 transition-opacity duration-400 ease-out ${
+              shown ? 'opacity-100' : 'opacity-0'
+            }`}
+          />
+          <div
+            className={`relative z-10 max-h-[85vh] w-full overflow-y-auto rounded-t-2xl bg-white p-5 shadow-xl transition-transform duration-400 ease-out ${
+              shown ? 'translate-y-0' : 'translate-y-full'
+            }`}
+          >
             <div className="mb-4 flex items-center justify-between">
               <h2 className="text-lg font-semibold">篩選條件</h2>
               <button
                 type="button"
-                onClick={() => setOpen(false)}
+                onClick={closeSheet}
                 aria-label="關閉篩選面板"
                 className="text-xl leading-none text-stone-400"
               >
@@ -273,7 +429,7 @@ export default function FilterSortPanel({ dishes }: Props) {
               </button>
               <button
                 type="button"
-                onClick={() => setOpen(false)}
+                onClick={closeSheet}
                 className="flex-1 rounded-full bg-amber-500 py-2 text-sm font-medium text-white"
               >
                 套用（{sorted.length} 道料理）

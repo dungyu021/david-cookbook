@@ -25,17 +25,19 @@ const dishIndex = dishes.map((dish) => ({
 
 <BaseLayout title="伏魔諭廚子">
   <div class="bg-[#fff9d9]">
-    <header class="mx-auto flex max-w-5xl flex-col items-center px-4 py-8 text-center sm:px-6">
+    <header class="mx-auto flex max-w-5xl items-center justify-center gap-4 px-4 py-8 sm:px-6">
       <Image
         src={logo}
         alt="伏魔諭廚子 Logo：額上有符印的黑貓"
         widths={[160, 320]}
-        sizes="112px"
-        class="h-28 w-28 rounded-full object-cover ring-1 ring-stone-200"
+        sizes="96px"
+        class="h-24 w-24 rounded-full object-cover"
         loading="eager"
       />
-      <h1 class="mt-4 text-3xl font-bold tracking-tight">伏魔諭廚子</h1>
-      <p class="mt-2 text-stone-500">持續更新料理中✍️</p>
+      <div class="text-left">
+        <h1 class="text-3xl font-bold tracking-tight">伏魔諭廚子</h1>
+        <p class="mt-1 text-stone-500">持續更新料理中✍️</p>
+      </div>
     </header>
   </div>
 

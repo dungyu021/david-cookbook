@@ -17,3 +17,41 @@
       sans-serif;
   }
 }
+
+/* 烹調時間雙向滑桿:兩個 <input type="range"> 疊在同一個軌道上,
+   軌道本身透明、只保留把手可以點擊拖曳,視覺上就像一條軌道兩個點。 */
+@layer components {
+  .range-thumb {
+    pointer-events: none;
+  }
+  .range-thumb::-webkit-slider-runnable-track {
+    -webkit-appearance: none;
+    background: transparent;
+  }
+  .range-thumb::-webkit-slider-thumb {
+    pointer-events: auto;
+    -webkit-appearance: none;
+    appearance: none;
+    width: 16px;
+    height: 16px;
+    border-radius: 9999px;
+    background: #f59e0b;
+    border: 2px solid white;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.25);
+    cursor: pointer;
+    margin-top: 0;
+  }
+  .range-thumb::-moz-range-track {
+    background: transparent;
+  }
+  .range-thumb::-moz-range-thumb {
+    pointer-events: auto;
+    width: 16px;
+    height: 16px;
+    border: 2px solid white;
+    border-radius: 9999px;
+    background: #f59e0b;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.25);
+    cursor: pointer;
+  }
+}
