@@ -1,7 +1,7 @@
 ---
 title: 火烤雞胸肉
 date: 2026-03-21
-stars: 5
+stars: 4.5
 tags: [主菜, 新手友善]
 cookingTimeMinutes: 20
 servings: 1
