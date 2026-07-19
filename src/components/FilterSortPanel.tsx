@@ -65,11 +65,14 @@ function groupIngredients(names: string[]) {
 }
 
 // 「想吃/不吃」整區塊的下拉開關:按下標題才展開所有大類別
+// 展開/收合動畫速度與手機版篩選面板(bottom sheet)一致:duration-400 ease-out
 function CollapsibleSection({
+  heading,
   title,
   count,
   children,
 }: {
+  heading: string;
   title: string;
   count: number;
   children: ReactNode;
@@ -77,6 +80,7 @@ function CollapsibleSection({
   const [open, setOpen] = useState(false);
   return (
     <section className="mb-5">
+      <h3 className="mb-2 text-sm font-bold text-stone-700">{heading}</h3>
       <button
         type="button"
         onClick={() => setOpen((v) => !v)}
@@ -86,9 +90,22 @@ function CollapsibleSection({
           {title}
           {count > 0 ? `（已選 ${count}）` : ''}
         </span>
-        <span className={`text-stone-400 transition-transform ${open ? 'rotate-180' : ''}`}>⌄</span>
+        <span
+          className={`text-stone-400 transition-transform duration-400 ease-out ${open ? 'rotate-180' : ''}`}
+        >
+          ⌄
+        </span>
       </button>
-      {open && <div className="mt-3">{children}</div>}
+      {/* grid-rows 0fr→1fr 是不需量測高度就能做「展開到內容高度」動畫的寫法 */}
+      <div
+        className={`grid transition-[grid-template-rows] duration-400 ease-out ${
+          open ? 'grid-rows-[1fr]' : 'grid-rows-[0fr]'
+        }`}
+      >
+        <div className="overflow-hidden">
+          <div className="mt-3">{children}</div>
+        </div>
+      </div>
     </section>
   );
 }
@@ -144,29 +161,39 @@ function IngredientGroupPicker({
                 aria-label={isExpanded ? `收合${group.label}細項` : `展開${group.label}細項`}
                 className="px-1 text-xs text-stone-400"
               >
-                <span className={`inline-block transition-transform ${isExpanded ? 'rotate-180' : ''}`}>
+                <span
+                  className={`inline-block transition-transform duration-400 ease-out ${
+                    isExpanded ? 'rotate-180' : ''
+                  }`}
+                >
                   ⌄
                 </span>
               </button>
             </div>
-            {isExpanded && (
-              <div className="mt-1.5 flex flex-wrap gap-1.5 pl-1">
-                {group.items.map((item) => (
-                  <button
-                    key={item}
-                    type="button"
-                    onClick={() => onToggleItem(item)}
-                    className={`rounded-full px-2.5 py-1 text-xs transition ${
-                      selected.includes(item)
-                        ? 'bg-amber-500 text-white'
-                        : 'bg-stone-100 text-stone-600'
-                    }`}
-                  >
-                    {item}
-                  </button>
-                ))}
+            <div
+              className={`grid transition-[grid-template-rows] duration-400 ease-out ${
+                isExpanded ? 'grid-rows-[1fr]' : 'grid-rows-[0fr]'
+              }`}
+            >
+              <div className="overflow-hidden">
+                <div className="mt-1.5 flex flex-wrap gap-1.5 pl-1">
+                  {group.items.map((item) => (
+                    <button
+                      key={item}
+                      type="button"
+                      onClick={() => onToggleItem(item)}
+                      className={`rounded-full px-2.5 py-1 text-xs transition ${
+                        selected.includes(item)
+                          ? 'bg-amber-500 text-white'
+                          : 'bg-stone-100 text-stone-600'
+                      }`}
+                    >
+                      {item}
+                    </button>
+                  ))}
+                </div>
               </div>
-            )}
+            </div>
           </div>
         );
       })}
@@ -187,31 +214,46 @@ function TagPicker({
   onToggle: (tag: string) => void;
 }) {
   const [showAll, setShowAll] = useState(false);
-  const visibleTags = showAll ? tags : tags.slice(0, TAG_PREVIEW_COUNT);
-  const hasMore = tags.length > TAG_PREVIEW_COUNT;
+  const previewTags = tags.slice(0, TAG_PREVIEW_COUNT);
+  const restTags = tags.slice(TAG_PREVIEW_COUNT);
+  const hasMore = restTags.length > 0;
+
+  const renderTag = (tag: string) => (
+    <button
+      key={tag}
+      type="button"
+      onClick={() => onToggle(tag)}
+      className={`rounded-full px-3 py-1 text-xs transition ${
+        selected.includes(tag) ? 'bg-amber-500 text-white' : 'bg-stone-100 text-stone-600'
+      }`}
+    >
+      #{tag}
+    </button>
+  );
 
   return (
-    <div className="flex flex-wrap gap-2">
-      {visibleTags.map((tag) => (
-        <button
-          key={tag}
-          type="button"
-          onClick={() => onToggle(tag)}
-          className={`rounded-full px-3 py-1 text-xs transition ${
-            selected.includes(tag) ? 'bg-amber-500 text-white' : 'bg-stone-100 text-stone-600'
-          }`}
-        >
-          #{tag}
-        </button>
-      ))}
+    <div>
+      <div className="flex flex-wrap gap-2">{previewTags.map(renderTag)}</div>
       {hasMore && (
-        <button
-          type="button"
-          onClick={() => setShowAll((v) => !v)}
-          className="rounded-full px-3 py-1 text-xs text-stone-500 underline underline-offset-2"
-        >
-          {showAll ? '收合' : `顯示更多（${tags.length - TAG_PREVIEW_COUNT}）`}
-        </button>
+        <>
+          {/* 其餘標籤收在這裡,展開時把下方的「顯示更多」按鈕往下推,收合時再把它推回去 */}
+          <div
+            className={`grid transition-[grid-template-rows] duration-400 ease-out ${
+              showAll ? 'grid-rows-[1fr]' : 'grid-rows-[0fr]'
+            }`}
+          >
+            <div className="overflow-hidden">
+              <div className="mt-2 flex flex-wrap gap-2">{restTags.map(renderTag)}</div>
+            </div>
+          </div>
+          <button
+            type="button"
+            onClick={() => setShowAll((v) => !v)}
+            className="mt-2 w-full rounded-full bg-stone-100 py-1.5 text-xs font-medium text-stone-600 transition"
+          >
+            {showAll ? '收合' : `顯示更多（${restTags.length}）`}
+          </button>
+        </>
       )}
     </div>
   );
@@ -434,11 +476,11 @@ export default function FilterSortPanel({ dishes }: Props) {
   const filterControls = (
     <>
       <section className="mb-5">
-        <h3 className="mb-2 text-sm font-medium text-stone-700">標籤</h3>
+        <h3 className="mb-2 text-sm font-bold text-stone-700">標籤</h3>
         <TagPicker tags={allTags} selected={selectedTags} onToggle={toggleTag} />
       </section>
 
-      <CollapsibleSection title="想吃..." count={includeIngredients.length}>
+      <CollapsibleSection heading="包含食材" title="想吃..." count={includeIngredients.length}>
         <IngredientGroupPicker
           groups={ingredientGroups}
           selected={includeIngredients}
@@ -447,7 +489,7 @@ export default function FilterSortPanel({ dishes }: Props) {
         />
       </CollapsibleSection>
 
-      <CollapsibleSection title="不吃..." count={excludeIngredients.length}>
+      <CollapsibleSection heading="排除食材" title="不吃..." count={excludeIngredients.length}>
         <IngredientGroupPicker
           groups={ingredientGroups}
           selected={excludeIngredients}
