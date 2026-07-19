@@ -15,8 +15,8 @@ const dishes = defineCollection({
       title: z.string().min(1, '菜名不能空白'),
       /** 上架日期,用於「最新」排序 */
       date: z.coerce.date(),
-      /** 星等 1–5,David 的個人推薦程度 */
-      stars: z.number().int().min(1).max(5),
+      /** 星等 1–5,可以是半顆星(例如 3.5、4.5),David 的個人推薦程度 */
+      stars: z.number().min(1).max(5).multipleOf(0.5),
       /** 標籤,自由輸入,例如 [義式, 主菜] */
       tags: z.array(z.string()).default([]),
       /** 預估烹調時間(分鐘),用於時間範圍篩選;顯示時滿 1 小時會自動換算成小時 */

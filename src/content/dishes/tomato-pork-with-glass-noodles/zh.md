@@ -2,7 +2,7 @@
 title: 番茄豬肉粉絲煲
 date: 2023-12-15
 stars: 4
-tags: [家常, 主菜, 湯品]
+tags: [家常, 主菜, 新手友善]
 cookingTimeMinutes: 30
 servings: 1
 cover: ./cover.jpg

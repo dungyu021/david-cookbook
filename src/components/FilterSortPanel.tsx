@@ -28,7 +28,7 @@ interface Props {
   dishes: DishIndexItem[];
 }
 
-type SortKey = 'date-desc' | 'date-asc' | 'stars-desc';
+type SortKey = 'date-desc' | 'date-asc' | 'stars-desc' | 'stars-asc';
 
 const TIME_STEP = 5;
 const TIME_MIN_GAP = 10;
@@ -356,6 +356,7 @@ export default function FilterSortPanel({ dishes }: Props) {
     copy.sort((a, b) => {
       if (sort === 'date-asc') return a.date - b.date;
       if (sort === 'stars-desc') return b.stars - a.stars || b.date - a.date;
+      if (sort === 'stars-asc') return a.stars - b.stars || b.date - a.date;
       return b.date - a.date;
     });
     return copy;
@@ -426,6 +427,7 @@ export default function FilterSortPanel({ dishes }: Props) {
       <option value="date-desc">上架時間：新到舊</option>
       <option value="date-asc">上架時間：舊到新</option>
       <option value="stars-desc">星等：高到低</option>
+      <option value="stars-asc">星等：低到高</option>
     </select>
   );
 
