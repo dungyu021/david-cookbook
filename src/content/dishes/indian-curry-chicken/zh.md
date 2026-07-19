@@ -1,7 +1,7 @@
 ---
 title: 印度咖哩雞佐香料飯
 date: 2023-11-30
-stars: 4
+stars: 3.5
 tags: [印度料理, 主菜]
 cookingTimeMinutes: 90
 servings: 2
