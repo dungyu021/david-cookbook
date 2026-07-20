@@ -572,11 +572,16 @@ export default function FilterSortPanel({ dishes }: Props) {
         </div>
       )}
 
-      {/* 桌面版:常駐側欄 */}
-      <aside className="hidden lg:sticky lg:top-8 lg:block lg:w-72 lg:shrink-0 lg:self-start">
+      {/* 桌面版:常駐側欄,排序與篩選分成兩個獨立格子 */}
+      <aside className="hidden lg:sticky lg:top-8 lg:block lg:w-72 lg:shrink-0 lg:self-start lg:space-y-4">
+        <div className="rounded-2xl border border-stone-200 bg-white p-5">
+          <h2 className="mb-3 text-lg font-semibold">排序</h2>
+          {sortSelect}
+        </div>
+
         <div className="rounded-2xl border border-stone-200 bg-white p-5">
           <div className="mb-4 flex items-center justify-between">
-            <h2 className="text-lg font-semibold">篩選與排序</h2>
+            <h2 className="text-lg font-semibold">篩選</h2>
             <button
               type="button"
               onClick={resetFilters}
@@ -585,11 +590,6 @@ export default function FilterSortPanel({ dishes }: Props) {
               清除篩選
             </button>
           </div>
-
-          <section className="mb-5">
-            <h3 className="mb-2 text-sm font-medium text-stone-700">排序</h3>
-            {sortSelect}
-          </section>
 
           {filterControls}
 
