@@ -477,8 +477,17 @@ export default function FilterSortPanel({ dishes }: Props) {
         <option value="stars-desc">星等：高到低</option>
         <option value="stars-asc">星等：低到高</option>
       </select>
-      <span className="pointer-events-none absolute right-3.5 top-1/2 -translate-y-1/2 leading-none text-stone-400">
-        ⌄
+      {/* 用 SVG 畫箭頭而不是文字符號:文字符號的字型度量會讓視覺置中跑掉,SVG 能精準置中 */}
+      <span className="pointer-events-none absolute inset-y-0 right-3.5 flex items-center text-stone-400">
+        <svg width="10" height="6" viewBox="0 0 10 6" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path
+            d="M1 1L5 5L9 1"
+            stroke="currentColor"
+            strokeWidth="1.5"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          />
+        </svg>
       </span>
     </div>
   );
