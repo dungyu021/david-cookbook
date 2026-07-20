@@ -477,7 +477,7 @@ export default function FilterSortPanel({ dishes }: Props) {
         <option value="stars-desc">星等：高到低</option>
         <option value="stars-asc">星等：低到高</option>
       </select>
-      <span className="pointer-events-none absolute right-3.5 top-1/2 -translate-y-1/2 text-stone-400">
+      <span className="pointer-events-none absolute right-3.5 top-1/2 -translate-y-1/2 leading-none text-stone-400">
         ⌄
       </span>
     </div>
