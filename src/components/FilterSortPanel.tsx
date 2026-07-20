@@ -460,6 +460,10 @@ export default function FilterSortPanel({ dishes }: Props) {
   const activeCount =
     selectedTags.length + includeIngredients.length + excludeIngredients.length;
 
+  // 「清除篩選」按鈕只在使用者真的動過篩選條件時才出現(烹調時間拉桿也算)
+  const hasActiveFilters =
+    activeCount > 0 || timeRange[0] !== timeBounds.min || timeRange[1] !== timeBounds.max;
+
   const sortSelect = (
     <select
       value={sort}
@@ -553,13 +557,15 @@ export default function FilterSortPanel({ dishes }: Props) {
             {filterControls}
 
             <div className="mt-4 flex gap-3">
-              <button
-                type="button"
-                onClick={resetFilters}
-                className="flex-1 rounded-full border border-stone-300 py-2 text-sm text-stone-600"
-              >
-                清除篩選
-              </button>
+              {hasActiveFilters && (
+                <button
+                  type="button"
+                  onClick={resetFilters}
+                  className="flex-1 rounded-full border border-stone-300 py-2 text-sm text-stone-600"
+                >
+                  清除篩選
+                </button>
+              )}
               <button
                 type="button"
                 onClick={closeSheet}
@@ -582,13 +588,15 @@ export default function FilterSortPanel({ dishes }: Props) {
         <div className="rounded-2xl border border-stone-200 bg-white p-5">
           <div className="mb-4 flex items-center justify-between">
             <h2 className="text-lg font-semibold">篩選</h2>
-            <button
-              type="button"
-              onClick={resetFilters}
-              className="text-xs text-stone-500 underline underline-offset-2"
-            >
-              清除篩選
-            </button>
+            {hasActiveFilters && (
+              <button
+                type="button"
+                onClick={resetFilters}
+                className="text-xs text-stone-500 underline underline-offset-2"
+              >
+                清除篩選
+              </button>
+            )}
           </div>
 
           {filterControls}
