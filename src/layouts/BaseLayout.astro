@@ -2,6 +2,7 @@
 // 全站共用的基礎版型:每個頁面都包在這個 Layout 裡
 // 負責 <head> 的 meta 標籤、語言宣告、全域樣式
 import '../styles/global.css';
+import logo from '../assets/logo.jpg';
 
 interface Props {
   /** 頁面標題(會顯示在瀏覽器分頁上) */
@@ -10,13 +11,20 @@ interface Props {
   description?: string;
   /** 頁面語言,預設繁體中文 */
   lang?: string;
+  /** 分享預覽圖(Open Graph),沒傳就用網站 logo */
+  image?: string;
 }
 
 const {
   title,
   description = '伏魔諭廚子——David 的個人料理作品集',
   lang = 'zh-Hant',
+  image = logo.src,
 } = Astro.props;
+
+// 目前頁面的完整網址,給 canonical 和 og:url 用
+const canonicalURL = new URL(Astro.url.pathname, Astro.site);
+const absoluteImage = new URL(image, Astro.site);
 ---
 
 <!doctype html>
@@ -25,7 +33,16 @@ const {
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="description" content={description} />
+    <link rel="canonical" href={canonicalURL} />
     <title>{title}</title>
+
+    {/* Open Graph:分享到 LINE、Facebook 等社群時顯示的預覽卡片 */}
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonicalURL} />
+    <meta property="og:image" content={absoluteImage} />
+    <meta name="twitter:card" content="summary_large_image" />
   </head>
   <body class="min-h-screen bg-stone-50 text-stone-900 antialiased">
     <slot />
