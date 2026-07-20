@@ -32,7 +32,7 @@ ingredients:
     amount: 1 片
   - name: 黑巧克力（70% 以上）
     amount: 15 克
-  - name: Parmesan 起司粉
+  - name: 帕馬森起司粉
     amount: 20 克
   - name: 綜合堅果
     amount: 15 克
