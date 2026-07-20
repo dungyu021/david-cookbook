@@ -64,6 +64,28 @@ function groupIngredients(names: string[]) {
   }));
 }
 
+// 下拉/展開用的箭頭:用 SVG 畫而不是文字符號「⌄」,文字符號的字型度量常讓視覺置中跑掉
+function ChevronIcon({ className = '' }: { className?: string }) {
+  return (
+    <svg
+      width="10"
+      height="6"
+      viewBox="0 0 10 6"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+      className={className}
+    >
+      <path
+        d="M1 1L5 5L9 1"
+        stroke="currentColor"
+        strokeWidth="1.5"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
+  );
+}
+
 // 「想吃/不吃」整區塊的下拉開關:按下標題才展開所有大類別
 // 展開/收合動畫速度與手機版篩選面板(bottom sheet)一致:duration-400 ease-out
 function CollapsibleSection({
@@ -91,9 +113,9 @@ function CollapsibleSection({
           {count > 0 ? `（已選 ${count}）` : ''}
         </span>
         <span
-          className={`text-stone-400 transition-transform duration-400 ease-out ${open ? 'rotate-180' : ''}`}
+          className={`flex text-stone-400 transition-transform duration-400 ease-out ${open ? 'rotate-180' : ''}`}
         >
-          ⌄
+          <ChevronIcon />
         </span>
       </button>
       {/* grid-rows 0fr→1fr 是不需量測高度就能做「展開到內容高度」動畫的寫法 */}
@@ -162,11 +184,11 @@ function IngredientGroupPicker({
                 className="px-1 text-xs text-stone-400"
               >
                 <span
-                  className={`inline-block transition-transform duration-400 ease-out ${
+                  className={`flex transition-transform duration-400 ease-out ${
                     isExpanded ? 'rotate-180' : ''
                   }`}
                 >
-                  ⌄
+                  <ChevronIcon />
                 </span>
               </button>
             </div>
@@ -465,7 +487,7 @@ export default function FilterSortPanel({ dishes }: Props) {
     activeCount > 0 || timeRange[0] !== timeBounds.min || timeRange[1] !== timeBounds.max;
 
   const sortSelect = (
-    // appearance-none 拿掉瀏覽器原生下拉箭頭(太貼右邊界),改用自訂的 ⌄ 符號控制位置
+    // appearance-none 拿掉瀏覽器原生下拉箭頭(太貼右邊界,且垂直位置不受 CSS 控制),改用 ChevronIcon
     <div className="relative inline-block">
       <select
         value={sort}
@@ -477,17 +499,8 @@ export default function FilterSortPanel({ dishes }: Props) {
         <option value="stars-desc">星等：高到低</option>
         <option value="stars-asc">星等：低到高</option>
       </select>
-      {/* 用 SVG 畫箭頭而不是文字符號:文字符號的字型度量會讓視覺置中跑掉,SVG 能精準置中 */}
       <span className="pointer-events-none absolute inset-y-0 right-3.5 flex items-center text-stone-400">
-        <svg width="10" height="6" viewBox="0 0 10 6" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <path
-            d="M1 1L5 5L9 1"
-            stroke="currentColor"
-            strokeWidth="1.5"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          />
-        </svg>
+        <ChevronIcon />
       </span>
     </div>
   );
