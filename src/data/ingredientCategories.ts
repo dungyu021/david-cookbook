@@ -83,7 +83,6 @@ const INGREDIENT_ALIASES: Record<string, string> = {
   黃檸檬: '檸檬',
   開心果: '堅果',
   綜合堅果: '堅果',
-  蕃茄罐頭: '番茄罐頭',
 };
 
 // 統一名稱 → 所屬大類別(沒列在這裡的一律視為「其他」)
