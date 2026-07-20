@@ -465,16 +465,22 @@ export default function FilterSortPanel({ dishes }: Props) {
     activeCount > 0 || timeRange[0] !== timeBounds.min || timeRange[1] !== timeBounds.max;
 
   const sortSelect = (
-    <select
-      value={sort}
-      onChange={(e) => setSort(e.target.value as SortKey)}
-      className="rounded-full border border-stone-300 bg-white px-4 py-2 text-sm text-stone-700 shadow-sm"
-    >
-      <option value="date-desc">上架時間：新到舊</option>
-      <option value="date-asc">上架時間：舊到新</option>
-      <option value="stars-desc">星等：高到低</option>
-      <option value="stars-asc">星等：低到高</option>
-    </select>
+    // appearance-none 拿掉瀏覽器原生下拉箭頭(太貼右邊界),改用自訂的 ⌄ 符號控制位置
+    <div className="relative inline-block">
+      <select
+        value={sort}
+        onChange={(e) => setSort(e.target.value as SortKey)}
+        className="appearance-none rounded-full border border-stone-300 bg-white py-2 pl-4 pr-9 text-sm text-stone-700 shadow-sm"
+      >
+        <option value="date-desc">上架時間：新到舊</option>
+        <option value="date-asc">上架時間：舊到新</option>
+        <option value="stars-desc">星等：高到低</option>
+        <option value="stars-asc">星等：低到高</option>
+      </select>
+      <span className="pointer-events-none absolute right-3.5 top-1/2 -translate-y-1/2 text-stone-400">
+        ⌄
+      </span>
+    </div>
   );
 
   const filterControls = (
