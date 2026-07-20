@@ -2,7 +2,7 @@
 title: 溏心蛋
 date: 2023-09-15
 stars: 5
-tags: [日式, 配菜]
+tags: [日式, 配菜, 新手友善]
 cookingTimeMinutes: 15
 servings: 4
 cover: ./cover.jpg
