@@ -9,9 +9,9 @@ cover: ./cover.jpg
 images: []
 ingredients:
   - name: 豬絞肉
-    amount: 150g
+    amount: 150 克
   - name: 牛絞肉
-    amount: 150g
+    amount: 150 克
   - name: 麵包粉
     amount: 3 大匙
   - name: 牛奶
@@ -29,7 +29,7 @@ ingredients:
   - name: 醬油
     amount: 1 大匙
   - name: 無鹽奶油
-    amount: 10g
+    amount: 10 克
   - name: 白胡椒
     amount: 適量
 draft: false

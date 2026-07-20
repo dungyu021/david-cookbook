@@ -9,27 +9,27 @@ cover: ./cover.jpg
 images: [./photo-2.jpg]
 ingredients:
   - name: 豬絞肉
-    amount: 150克
+    amount: 150 克
   - name: 牛絞肉
-    amount: 150克
+    amount: 150 克
   - name: 咖哩塊
-    amount: 1盒（6小塊）
+    amount: 1 盒（6 小塊）
   - name: 咖哩粉
-    amount: 3大匙
+    amount: 3 大匙
   - name: 濃縮咖啡（或即溶咖啡粉）
-    amount: 1份
+    amount: 1 份
   - name: 洋蔥
-    amount: 1/2顆
+    amount: 1/2 顆
   - name: 紅蘿蔔
-    amount: 1/2根
+    amount: 1/2 根
   - name: 馬鈴薯
-    amount: 1顆
+    amount: 1 顆
   - name: 蒜頭
-    amount: 4-5顆
+    amount: 4-5 顆
   - name: 全脂牛奶
-    amount: 300毫升
+    amount: 300 毫升
   - name: 起司片（或起司粉）
-    amount: 2片
+    amount: 2 片
   - name: 煙燻紅椒粉
     amount: 少許
   - name: 黑胡椒
@@ -45,7 +45,7 @@ draft: false
 2. 鍋中先用大量油半煎炸馬鈴薯丁，直到每一顆都呈現薯餅般的金黃色，撈出後平鋪在餐巾紙上降溫。
 3. 將鍋中大部分油取出，油熱後加入絞肉，耐心炒至水份消失只剩油脂，直到絞肉開始呈現棕色焦化層。
 4. 加入洋蔥丁、紅蘿蔔丁、蒜末、咖哩粉、紅椒粉、黑胡椒，炒出香味。
-5. 加入咖哩塊，炒至溶解後倒入牛奶和咖啡，燉煮10分鐘。
+5. 加入咖哩塊，炒至溶解後倒入牛奶和咖啡，燉煮 10 分鐘。
 6. 加入起司攪拌直到溶解。
 7. 起鍋前加入炸馬鈴薯丁拌勻。
 8. 出爐😋！

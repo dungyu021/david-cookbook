@@ -23,9 +23,9 @@ ingredients:
   - name: 白吐司
     amount: 1 片
   - name: 鮮奶油
-    amount: 50ml
+    amount: 50 毫升
   - name: 堅果
-    amount: 30g
+    amount: 30 克
   - name: 橄欖油
     amount: 適量
   - name: 鹽

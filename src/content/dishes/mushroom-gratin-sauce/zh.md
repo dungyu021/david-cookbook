@@ -9,13 +9,13 @@ cover: ./cover.jpg
 images: []
 ingredients:
   - name: 無鹽奶油
-    amount: 20g
+    amount: 20 克
   - name: 低筋麵粉（或玉米粉）
-    amount: 20g
+    amount: 20 克
   - name: 牛奶
-    amount: 240g
+    amount: 240 克
   - name: 蘑菇
-    amount: 200g
+    amount: 200 克
   - name: 洋蔥
     amount: 半顆
   - name: 培根

@@ -8,29 +8,29 @@ servings: 1
 cover: ./cover.jpg
 ingredients:
   - name: 五花肉片
-    amount: 100g
+    amount: 100 克
   - name: 洋蔥
     amount: 半顆
   - name: 蒜頭
-    amount: 2瓣
+    amount: 2 瓣
   - name: 牛番茄
-    amount: 1顆
+    amount: 1 顆
   - name: 青江菜
-    amount: 2株
+    amount: 2 株
   - name: 雞蛋
-    amount: 1顆
+    amount: 1 顆
   - name: 花枝丸
-    amount: 4顆
+    amount: 4 顆
   - name: 魚卵卷
-    amount: 3片
+    amount: 3 片
   - name: 冬粉
-    amount: 1把（約50g）
+    amount: 1 把（約 50 克）
   - name: 米酒
-    amount: 1大匙
+    amount: 1 大匙
   - name: 醬油
-    amount: 1大匙
+    amount: 1 大匙
   - name: 蠔油
-    amount: 1大匙
+    amount: 1 大匙
   - name: 醋
     amount: 少許
   - name: 蔥花

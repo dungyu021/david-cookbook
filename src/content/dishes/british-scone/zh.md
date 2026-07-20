@@ -9,25 +9,25 @@ cover: ./cover.jpg
 images: [./photo-2.jpg]
 ingredients:
   - name: 低筋麵粉
-    amount: 150g
+    amount: 150 克
   - name: 砂糖
-    amount: 20g
+    amount: 20 克
   - name: 鹽
-    amount: 1g
+    amount: 1 克
   - name: 泡打粉
-    amount: 3g
+    amount: 3 克
   - name: 無鹽奶油（冰）
-    amount: 45g
+    amount: 45 克
   - name: 全蛋液（冰）
-    amount: 30g
+    amount: 30 克
   - name: 動物性鮮奶油（冰）
-    amount: 50g
+    amount: 50 克
   - name: 蛋黃液（表面刷色用）
     amount: 適量
   - name: 伯爵茶包（可選項）
-    amount: 4g（約2包）
+    amount: 4 克（約 2 包）
   - name: 抹茶粉（可選項）
-    amount: 8g
+    amount: 8 克
 draft: false
 ---
 
@@ -39,8 +39,8 @@ draft: false
 4. 加入冰的全蛋液，攪拌均勻。
 5. 加入冰的動物性鮮奶油攪拌，攪拌至成團（不要過度搓揉，避免出筋）
 6. 將麵團放到砧板或揉麵板上，用刮刀對半切開，兩片疊起後按扁，重複三次。
-7. 將麵團包上保鮮膜，送入冰箱冷藏休息30分鐘。
-8. 取出麵團整型後分成6等份，可用刮刀切成正方形，或用模具壓型。
+7. 將麵團包上保鮮膜，送入冰箱冷藏休息 30 分鐘。
+8. 取出麵團整型後分成 6 等份，可用刮刀切成正方形，或用模具壓型。
 9. 進烤箱前在表面刷上蛋黃液。
-10. 烤箱預熱180度，烤20分鐘。
+10. 烤箱預熱 180 度，烤 20 分鐘。
 11. 出爐😋！

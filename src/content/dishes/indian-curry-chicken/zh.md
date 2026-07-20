@@ -8,31 +8,31 @@ servings: 2
 cover: ./cover.jpg
 ingredients:
   - name: 雞腿排肉
-    amount: 2片（約400g）
+    amount: 2 片（約 400 克）
   - name: 希臘式優格
-    amount: 3大匙
+    amount: 3 大匙
   - name: 咖哩粉
-    amount: 3大匙
+    amount: 3 大匙
   - name: 肉桂粉
-    amount: 1小匙
+    amount: 1 小匙
   - name: 紅辣椒粉
-    amount: 1小匙
+    amount: 1 小匙
   - name: 月桂葉
-    amount: 1片
+    amount: 1 片
   - name: 洋蔥
-    amount: 1顆
+    amount: 1 顆
   - name: 牛番茄
-    amount: 2顆
+    amount: 2 顆
   - name: 鮮奶油
-    amount: 100ml
+    amount: 100 毫升
   - name: 堅果
     amount: 適量（可省略）
   - name: 奶油
-    amount: 1大匙
+    amount: 1 大匙
   - name: 香菇
-    amount: 3朵
+    amount: 3 朵
   - name: 白米
-    amount: 2杯
+    amount: 2 杯
   - name: 食用油
     amount: 適量
 draft: false

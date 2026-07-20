@@ -11,13 +11,13 @@ ingredients:
   - name: 雞蛋
     amount: 4 顆
   - name: 醬油
-    amount: 50g
+    amount: 50 克
   - name: 米酒
-    amount: 50g
+    amount: 50 克
   - name: 味醂
-    amount: 30g
+    amount: 30 克
   - name: 水
-    amount: 80g
+    amount: 80 克
   - name: 鹽
     amount: 適量（煮蛋用）
 draft: false

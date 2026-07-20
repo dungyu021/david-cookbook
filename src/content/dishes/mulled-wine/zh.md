@@ -9,17 +9,17 @@ cover: ./cover.jpg
 images: [./photo-2.jpg]
 ingredients:
   - name: 紅酒
-    amount: 1瓶
+    amount: 1 瓶
   - name: 富士蘋果
-    amount: 1顆
+    amount: 1 顆
   - name: 甜橙
-    amount: 1顆
+    amount: 1 顆
   - name: 橘子
-    amount: 1顆
+    amount: 1 顆
   - name: 肉桂棒
-    amount: 1根
+    amount: 1 根
   - name: 月桂葉
-    amount: 1片
+    amount: 1 片
   - name: 砂糖
     amount: 適量
 draft: false
