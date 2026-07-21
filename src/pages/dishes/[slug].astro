@@ -37,10 +37,11 @@ const cookingTimeText =
 const d = dish.data.date;
 const dateText = `${d.getUTCFullYear()}/${String(d.getUTCMonth() + 1).padStart(2, '0')}/${String(d.getUTCDate()).padStart(2, '0')}`;
 
-// 食材份量若結尾有括號備注(例如「少許（可省略）」),拆開讓備注另起一行顯示
-function splitAmount(amount: string) {
-  const match = amount.match(/^(.*?)\s*(（[^）]*）)$/);
-  return match ? { main: match[1], note: match[2] } : { main: amount, note: null };
+// 食材名稱或份量結尾若有括號備注(例如「黑巧克力（70% 以上）」「1 小匙（可用柴魚片 5 克代替）」),
+// 拆開後統一把備注顯示在食材名稱下方另起一行,份量欄位只留主要數字
+function splitTrailingParen(text: string) {
+  const match = text.match(/^(.*?)\s*(（[^）]*）)$/);
+  return match ? { main: match[1], note: match[2] } : { main: text, note: null };
 }
 ---
 
@@ -130,14 +131,18 @@ function splitAmount(amount: string) {
         <ul class="mt-3 divide-y divide-stone-100 rounded-xl bg-white ring-1 ring-stone-200/60">
           {
             dish.data.ingredients.map((item) => {
-              const { main, note } = splitAmount(item.amount);
+              const nameSplit = splitTrailingParen(item.name);
+              const amountSplit = splitTrailingParen(item.amount);
+              const notes = [nameSplit.note, amountSplit.note].filter(Boolean);
               return (
                 <li class="flex items-center justify-between px-4 py-2.5 text-sm">
-                  <span>{item.name}</span>
-                  <span class="text-right text-stone-500">
-                    <span class="block">{main}</span>
-                    {note && <span class="block text-xs">{note}</span>}
+                  <span>
+                    <span class="block">{nameSplit.main}</span>
+                    {notes.map((note) => (
+                      <span class="block text-xs text-stone-400">{note}</span>
+                    ))}
                   </span>
+                  <span class="text-stone-500">{amountSplit.main}</span>
                 </li>
               );
             })

@@ -9,7 +9,7 @@ cover: ./cover.jpg
 images: [./photo-2.jpg, ./photo-3.jpg]
 ingredients:
   - name: 帶皮豬五花肉
-    amount: 一大塊（約 1.5 公斤）
+    amount: 一大塊 1.5 公斤
   - name: 迷迭香
     amount: 1 大匙（切碎）
   - name: 百里香
