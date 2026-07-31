@@ -50,6 +50,7 @@ const SEASONING_EXCLUDE = new Set([
   '月桂葉',
   '百里香',
   '迷迭香',
+  '乾羅勒',
   '蔥花',
   '咖哩粉',
   '咖哩塊',
