@@ -2,7 +2,7 @@
 // 全站共用的基礎版型:每個頁面都包在這個 Layout 裡
 // 負責 <head> 的 meta 標籤、語言宣告、全域樣式
 import '../styles/global.css';
-import logo from '../assets/logo.jpg';
+import logo from '../assets/logo.png';
 
 interface Props {
   /** 頁面標題(會顯示在瀏覽器分頁上) */
@@ -35,6 +35,7 @@ const absoluteImage = new URL(image, Astro.site);
     <meta name="description" content={description} />
     <meta name="google-site-verification" content="YiF0Sg5YIODk1vsK43UAAv0cD7t66rCQOAHSa2o75D0" />
     <link rel="canonical" href={canonicalURL} />
+    <link rel="icon" type="image/png" href="/favicon.png" />
     <title>{title}</title>
 
     {/* Open Graph:分享到 LINE、Facebook 等社群時顯示的預覽卡片 */}
