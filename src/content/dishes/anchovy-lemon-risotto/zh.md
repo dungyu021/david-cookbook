@@ -2,7 +2,7 @@
 title: 檸檬鯷魚燉飯
 date: 2024-12-21
 stars: 3.5
-tags: [義式, 主菜]
+tags: [義式, 主菜, 燉飯]
 cookingTimeMinutes: 40
 servings: 2
 cover: ./cover.jpg
