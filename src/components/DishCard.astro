@@ -19,9 +19,9 @@ const dateText = `${d.getUTCFullYear()}/${String(d.getUTCMonth() + 1).padStart(2
 <a
   href={`/dishes/${slug}/`}
   data-slug={slug}
-  class="group block overflow-hidden rounded-2xl bg-white shadow-sm ring-1 ring-stone-200/60 transition hover:shadow-md"
+  class="group flex h-full flex-col overflow-hidden rounded-2xl bg-white shadow-sm ring-1 ring-stone-200/60 transition hover:shadow-md"
 >
-  <div class="aspect-[4/3] overflow-hidden bg-stone-100">
+  <div class="aspect-[4/3] shrink-0 overflow-hidden bg-stone-100">
     <Image
       src={dish.data.cover}
       alt={dish.data.title}
@@ -31,7 +31,7 @@ const dateText = `${d.getUTCFullYear()}/${String(d.getUTCMonth() + 1).padStart(2
       loading="lazy"
     />
   </div>
-  <div class="flex flex-col gap-2 p-4">
+  <div class="flex flex-1 flex-col gap-2 p-4">
     <h2 class="text-lg font-semibold leading-snug">{dish.data.title}</h2>
     <StarRating stars={dish.data.stars} />
     <ul class="flex flex-wrap gap-1.5">
@@ -43,6 +43,7 @@ const dateText = `${d.getUTCFullYear()}/${String(d.getUTCMonth() + 1).padStart(2
         ))
       }
     </ul>
-    <p class="text-right text-xs text-stone-500">{dateText}</p>
+    {/* mt-auto 讓日期固定貼齊卡片底部,不受標題行數影響 */}
+    <p class="mt-auto text-right text-xs text-stone-500">{dateText}</p>
   </div>
 </a>
