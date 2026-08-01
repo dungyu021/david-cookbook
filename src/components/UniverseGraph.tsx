@@ -225,7 +225,9 @@ export default function UniverseGraph() {
       }
 
       const threeObjectFor = (n: GraphNode) => {
-        if (n.subtype !== 'ingredient') return undefined;
+        // 標籤(tag)剛好跟某個食材同名時(例如「義大利麵」既是食材也是分類標籤)
+        // 也套用同一顆模型,不只限於食材節點,畫面上才不會出現「同名字卻長得不一樣」的兩顆球
+        if (n.type !== 'attr') return undefined;
         const file = INGREDIENT_MODELS[n.name];
         const template = file && modelTemplates.get(file);
         if (!template) return undefined;

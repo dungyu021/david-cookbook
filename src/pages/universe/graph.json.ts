@@ -8,7 +8,7 @@ import type { APIRoute } from 'astro';
 import { getCollection } from 'astro:content';
 import { getImage } from 'astro:assets';
 import { normalizeIngredientName } from '../../data/ingredientCategories';
-import { GRAPH_EXCLUDE_INGREDIENTS } from '../../data/graphExclude';
+import { GRAPH_EXCLUDE_INGREDIENTS, GRAPH_EXCLUDE_TAGS } from '../../data/graphExclude';
 
 type DishNode = {
   id: string;
@@ -53,6 +53,8 @@ export const GET: APIRoute = async () => {
     });
 
     for (const tag of dish.data.tags) {
+      if (GRAPH_EXCLUDE_TAGS.includes(tag)) continue;
+
       const tagId = `tag:${tag}`;
       if (!nodes.has(tagId)) {
         nodes.set(tagId, { id: tagId, type: 'attr', subtype: 'tag', name: tag });
