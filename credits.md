@@ -10,7 +10,7 @@
 - **Ultimate Food Pack** — https://poly.pizza/bundle/Ultimate-Food-Pack-h3WC1gyRb4
   作者:Quaternius — https://poly.pizza/u/Quaternius(透過 Poly Pizza)— 授權:CC0
 
-## 個別模型(CC-BY 3.0,法律上要求標明出處)
+## 個別模型(CC-BY,法律上要求標明出處)
 
 - **Garlic**(`garlic.glb`)— https://poly.pizza/m/0obkpR0BuEa
   作者:Poly by Google — 授權:[CC-BY 3.0](https://creativecommons.org/licenses/by/3.0/)(透過 Poly Pizza)
@@ -29,3 +29,9 @@
 
 - **Bowl of rice**(`rice.glb`,用來代表 Carnaroli 燉飯米與白米)— https://poly.pizza/m/dcnV-eqevIB
   作者:Poly by Google — 授權:[CC-BY 3.0](https://creativecommons.org/licenses/by/3.0/)(透過 Poly Pizza)
+
+- **Flour ARIDLL**(`flour.glb`)— https://skfb.ly/oLvnR
+  作者:fwild — 授權:[CC-BY 4.0](http://creativecommons.org/licenses/by/4.0/)(透過 Sketchfab)
+
+- **Cucumber**(`cucumber.glb`,用來代表小黃瓜與櫛瓜)— https://poly.pizza/m/6aGChBQiu8j
+  作者:jeremy — 授權:[CC-BY 3.0](https://creativecommons.org/licenses/by/3.0/)(透過 Poly Pizza)

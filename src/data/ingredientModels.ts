@@ -39,4 +39,7 @@ export const INGREDIENT_MODELS: Record<string, string> = {
   義大利麵: 'spaghetti.glb',
   'Carnaroli 燉飯米': 'rice.glb', // 跟白米共用同一顆飯碗模型
   白米: 'rice.glb',
+  麵粉: 'flour.glb',
+  櫛瓜: 'cucumber.glb',
+  小黃瓜: 'cucumber.glb', // 目前還沒有料理用到,先接好等以後用
 };
