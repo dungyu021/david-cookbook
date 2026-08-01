@@ -1,0 +1,10 @@
+---
+// 料理宇宙(3D 關係圖,見 universe-spec.md)。實驗性功能,目前只有繁中版。
+// UniverseGraph 用 client:only 掛載,Three.js 相關程式碼完全不會載入到首頁等其他頁面。
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import UniverseGraph from '../../components/UniverseGraph';
+---
+
+<BaseLayout title="料理宇宙 — 伏魔諭廚子" description="探索料理、標籤與食材之間的 3D 關係圖">
+  <UniverseGraph client:only="react" />
+</BaseLayout>

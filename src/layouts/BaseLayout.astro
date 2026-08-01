@@ -46,7 +46,16 @@ const absoluteImage = new URL(image, Astro.site);
     <meta property="og:image" content={absoluteImage} />
     <meta name="twitter:card" content="summary_large_image" />
   </head>
-  <body class="min-h-screen bg-stone-50 text-stone-900 antialiased">
-    <slot />
+  <body class="flex min-h-screen flex-col bg-stone-50 text-stone-900 antialiased">
+    <div class="flex-1">
+      <slot />
+    </div>
+
+    {/* 實驗性功能入口:不擋主要內容,只在頁尾用小字呈現 */}
+    <footer class="py-6 text-center">
+      <a href="/universe/" class="text-xs text-stone-400 underline underline-offset-2">
+        ✨ 實驗性功能:料理宇宙
+      </a>
+    </footer>
   </body>
 </html>
