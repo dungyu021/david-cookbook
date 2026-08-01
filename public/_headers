@@ -1,0 +1,5 @@
+# Cloudflare Pages 專用的回應標頭設定
+# graph.json 是靜態輸出的檔案,Cloudflare 預設只會用副檔名判斷 Content-Type(application/json,不含編碼),
+# 手機瀏覽器直接開啟時容易誤判中文編碼變成亂碼,這裡明確指定 charset=utf-8 修正。
+/universe/graph.json
+  Content-Type: application/json; charset=utf-8
