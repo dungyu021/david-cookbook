@@ -88,6 +88,6 @@ export const GET: APIRoute = async () => {
   );
 
   return new Response(JSON.stringify(graph), {
-    headers: { 'Content-Type': 'application/json' },
+    headers: { 'Content-Type': 'application/json; charset=utf-8' },
   });
 };
