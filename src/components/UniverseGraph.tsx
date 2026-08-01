@@ -60,19 +60,22 @@ function isWebGLSupported() {
 export default function UniverseGraph() {
   const containerRef = useRef<HTMLDivElement>(null);
   const [status, setStatus] = useState<'loading' | 'unsupported' | 'error' | 'ready'>('loading');
-  const [selectedDish, setSelectedDish] = useState<SelectedDish | null>(null);
-  const [selectedLabel, setSelectedLabel] = useState<string | null>(null);
+  // 目前選取的節點可以有多個(見下方 onNodeClick 的多選邏輯),dish/attr 分開存放給不同 UI 用
+  const [selectedDishes, setSelectedDishes] = useState<SelectedDish[]>([]);
+  const [selectedLabels, setSelectedLabels] = useState<string[]>([]);
   const [cardVisible, setCardVisible] = useState(false);
-  // 讓卡片的關閉按鈕(DOM)可以呼叫到掛載在 3D 場景 closure 裡的取消高亮邏輯
+  const hasSelection = selectedDishes.length > 0 || selectedLabels.length > 0;
+  // 讓 DOM 上的按鈕(關閉、迷路重置視角)可以呼叫到掛載在 3D 場景 closure 裡的邏輯
   const clearSelectionRef = useRef<() => void>(() => {});
+  const resetViewRef = useRef<() => void>(() => {});
 
   useEffect(() => {
-    if (selectedDish) {
+    if (selectedDishes.length > 0) {
       const id = requestAnimationFrame(() => setCardVisible(true));
       return () => cancelAnimationFrame(id);
     }
     setCardVisible(false);
-  }, [selectedDish]);
+  }, [selectedDishes.length]);
 
   useEffect(() => {
     if (!isWebGLSupported()) {
@@ -124,9 +127,11 @@ export default function UniverseGraph() {
       // 節點的鄰居 id、以及節點牽涉到的連線,給點擊高亮用
       const neighborsById = new Map<string, Set<string>>();
       const linksById = new Map<string, Set<GraphLink>>();
+      const nodesById = new Map<string, GraphNode>();
       for (const node of data.nodes) {
         neighborsById.set(node.id, new Set());
         linksById.set(node.id, new Set());
+        nodesById.set(node.id, node);
       }
       for (const link of data.links) {
         degree.set(link.source, (degree.get(link.source) ?? 0) + 1);
@@ -138,10 +143,38 @@ export default function UniverseGraph() {
       }
       const maxDegree = Math.max(1, ...data.nodes.map((n) => degree.get(n.id) ?? 0));
 
-      // 目前高亮狀態(不用 React state,click 事件在 three.js 場景裡直接讀寫這幾個變數即可)
-      let selectedId: string | null = null;
+      // 目前高亮狀態(不用 React state,click 事件在 three.js 場景裡直接讀寫這幾個變數即可)。
+      // selectedSeeds 是使用者實際點過的節點(可以有多個);highlightNodeIds/highlightLinks
+      // 是所有 seed 的鄰居/連線聯集,每次 seed 變動就整個重算一次。
+      const selectedSeeds = new Set<string>();
       let highlightNodeIds = new Set<string>();
       let highlightLinks = new Set<GraphLink>();
+
+      const recomputeHighlight = () => {
+        const nodes = new Set<string>();
+        const links = new Set<GraphLink>();
+        selectedSeeds.forEach((id) => {
+          nodes.add(id);
+          neighborsById.get(id)?.forEach((nb) => nodes.add(nb));
+          linksById.get(id)?.forEach((l) => links.add(l));
+        });
+        highlightNodeIds = nodes;
+        highlightLinks = links;
+      };
+
+      // 把目前的 seed 節點資料同步到 React state,驅動關閉按鈕/標籤/卡片 UI
+      const syncSelectionUI = () => {
+        const dishes: SelectedDish[] = [];
+        const labels: string[] = [];
+        selectedSeeds.forEach((id) => {
+          const n = nodesById.get(id);
+          if (!n) return;
+          if (n.type === 'dish') dishes.push({ name: n.name, slug: n.slug!, cover: n.cover! });
+          else labels.push(n.name);
+        });
+        setSelectedDishes(dishes);
+        setSelectedLabels(labels);
+      };
 
       const attrOpacity = (n: GraphNode) => {
         const d = degree.get(n.id) ?? 1;
@@ -249,33 +282,29 @@ export default function UniverseGraph() {
       };
 
       const clearSelection = () => {
-        selectedId = null;
+        selectedSeeds.clear();
         highlightNodeIds = new Set();
         highlightLinks = new Set();
         refreshHighlight();
-        setSelectedDish(null);
-        setSelectedLabel(null);
+        syncSelectionUI();
       };
       clearSelectionRef.current = clearSelection;
+      resetViewRef.current = () => graph.zoomToFit(800, 60);
 
       graph.onNodeClick((node: GraphNode) => {
-        if (selectedId === node.id) {
-          clearSelection();
-          return;
-        }
-        selectedId = node.id;
-        highlightNodeIds = new Set([node.id, ...(neighborsById.get(node.id) ?? [])]);
-        highlightLinks = linksById.get(node.id) ?? new Set();
-        refreshHighlight();
-        flyTo(node);
-
-        if (node.type === 'dish') {
-          setSelectedDish({ name: node.name, slug: node.slug!, cover: node.cover! });
-          setSelectedLabel(null);
+        // 再點一次已選的節點 = 只取消那一個 seed(其他還留著);
+        // 點新節點 = 加進去,可以同時多選,擴展出去或比較不同群集之間的連結
+        const wasSelected = selectedSeeds.has(node.id);
+        if (wasSelected) {
+          selectedSeeds.delete(node.id);
         } else {
-          setSelectedLabel(node.name);
-          setSelectedDish(null);
+          selectedSeeds.add(node.id);
         }
+        recomputeHighlight();
+        refreshHighlight();
+        syncSelectionUI();
+        // 取消選取時鏡頭不用動,只有新加入選取才飛過去
+        if (!wasSelected) flyTo(node);
       });
 
       graph.onBackgroundClick(() => clearSelection());
@@ -322,46 +351,72 @@ export default function UniverseGraph() {
         </div>
       )}
 
-      {/* 點擊紫色(標籤/食材)節點:只顯示名稱的小標籤 */}
-      {selectedLabel && (
-        <div className="pointer-events-none absolute inset-x-0 top-6 flex justify-center px-6">
-          <div className="rounded-full bg-white/90 px-4 py-1.5 text-sm font-medium text-stone-800 shadow">
-            {selectedLabel}
+      {/* 有節點被選取時:左上角半透明關閉鈕,點下或點畫面空白處都會清空所有選取 */}
+      {hasSelection && (
+        <button
+          type="button"
+          onClick={() => clearSelectionRef.current()}
+          aria-label="關閉"
+          className="fixed left-4 top-4 z-50 flex h-9 w-9 items-center justify-center rounded-full bg-black/40 text-lg text-white backdrop-blur-sm"
+        >
+          ✕
+        </button>
+      )}
+
+      {/* 點擊紫色(標籤/食材)節點:顯示名稱小標籤,可以同時選好幾個節點 */}
+      {selectedLabels.length > 0 && (
+        <div className="pointer-events-none absolute inset-x-0 top-4 flex flex-wrap justify-center gap-2 px-16">
+          {selectedLabels.map((label) => (
+            <div
+              key={label}
+              className="rounded-full bg-white/90 px-4 py-1.5 text-sm font-medium text-stone-800 shadow"
+            >
+              {label}
+            </div>
+          ))}
+        </div>
+      )}
+
+      {/* 點擊橘色(料理)節點:料理小卡片,可以同時選好幾道菜。手機從底部彈出、可上下滑動,桌面貼右下角 */}
+      {selectedDishes.length > 0 && (
+        <div className="fixed inset-x-0 bottom-0 z-40 lg:inset-x-auto lg:bottom-6 lg:right-6 lg:w-80">
+          <div
+            className={`max-h-[60vh] space-y-3 overflow-y-auto rounded-t-2xl bg-white p-4 shadow-xl transition-transform duration-400 ease-out lg:rounded-2xl ${
+              cardVisible ? 'translate-y-0' : 'translate-y-full'
+            }`}
+          >
+            {selectedDishes.map((dish) => (
+              <div key={dish.slug} className="flex items-center gap-4">
+                <img
+                  src={dish.cover}
+                  alt={dish.name}
+                  className="h-16 w-16 shrink-0 rounded-xl object-cover"
+                />
+                <div className="min-w-0 flex-1">
+                  <p className="truncate font-semibold text-stone-900">{dish.name}</p>
+                  <a
+                    href={`/dishes/${dish.slug}/`}
+                    className="mt-1 inline-block text-sm text-amber-600 underline underline-offset-2"
+                  >
+                    查看這道菜 →
+                  </a>
+                </div>
+              </div>
+            ))}
           </div>
         </div>
       )}
 
-      {/* 點擊橘色(料理)節點:料理小卡片。手機從底部彈出,桌面貼右下角 */}
-      {selectedDish && (
-        <div className="fixed inset-x-0 bottom-0 z-50 lg:inset-x-auto lg:bottom-6 lg:right-6 lg:w-80">
-          <div
-            className={`flex items-center gap-4 rounded-t-2xl bg-white p-4 shadow-xl transition-transform duration-400 ease-out lg:rounded-2xl ${
-              cardVisible ? 'translate-y-0' : 'translate-y-full'
-            }`}
+      {/* 沒有選取任何節點時:畫面下方半透明的「迷路了」按鈕,點下去鏡頭回到看得到完整關係網的視角 */}
+      {status === 'ready' && !hasSelection && (
+        <div className="pointer-events-none fixed inset-x-0 bottom-6 z-40 flex justify-center">
+          <button
+            type="button"
+            onClick={() => resetViewRef.current()}
+            className="pointer-events-auto rounded-full bg-black/40 px-4 py-2 text-sm text-white/90 backdrop-blur-sm"
           >
-            <img
-              src={selectedDish.cover}
-              alt={selectedDish.name}
-              className="h-16 w-16 shrink-0 rounded-xl object-cover"
-            />
-            <div className="min-w-0 flex-1">
-              <p className="truncate font-semibold text-stone-900">{selectedDish.name}</p>
-              <a
-                href={`/dishes/${selectedDish.slug}/`}
-                className="mt-1 inline-block text-sm text-amber-600 underline underline-offset-2"
-              >
-                查看這道菜 →
-              </a>
-            </div>
-            <button
-              type="button"
-              onClick={() => clearSelectionRef.current()}
-              aria-label="關閉"
-              className="shrink-0 text-xl leading-none text-stone-400"
-            >
-              ✕
-            </button>
-          </div>
+            迷路了?點擊這裡
+          </button>
         </div>
       )}
     </div>
