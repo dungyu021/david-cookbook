@@ -383,7 +383,9 @@ export default function UniverseGraph() {
       {selectedDishes.length > 0 && (
         <div className="fixed inset-x-0 bottom-0 z-40 lg:inset-x-auto lg:bottom-6 lg:right-6 lg:w-80">
           <div
-            className={`max-h-[60vh] space-y-3 overflow-y-auto rounded-t-2xl bg-white p-4 shadow-xl transition-transform duration-400 ease-out lg:rounded-2xl ${
+            // 卡片高 h-16(4rem)+ 間距 space-y-3(0.75rem)+ 上方 padding(1rem),
+            // 算出剛好露出「第 3(手機)/第 5(桌面)張卡片一半」的高度,提示使用者還能往下滑
+            className={`max-h-[12.5rem] space-y-3 overflow-y-auto rounded-t-2xl bg-white p-4 shadow-xl transition-transform duration-400 ease-out lg:max-h-[22rem] lg:rounded-2xl ${
               cardVisible ? 'translate-y-0' : 'translate-y-full'
             }`}
           >
