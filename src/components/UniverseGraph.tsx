@@ -143,7 +143,13 @@ export default function UniverseGraph() {
         .nodeLabel((n: GraphNode) => n.name)
         .linkColor(linkColorFor)
         .linkWidth(linkWidthFor)
-        .showNavInfo(false);
+        .showNavInfo(false)
+        // 手機上單指觸碰節點預設會觸發拖曳(移動節點),很容易跟「單指旋轉鏡頭」的手勢打架,
+        // 這個功能沒有實際用途,關掉後手機操作才會跟滑鼠一致、順手
+        .enableNodeDrag(false);
+
+      // 高 DPI 手機(devicePixelRatio 3 以上)全速渲染很吃 GPU,容易掉幀;上限抓 2 對畫質影響不大
+      graph.renderer().setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
 
       // 重新指派同一個 accessor 是 3d-force-graph 官方建議的「強制重繪」寫法
       const refreshHighlight = () => {
