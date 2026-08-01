@@ -84,8 +84,8 @@ export default function UniverseGraph() {
             ATTR_MIN_OPACITY + (ATTR_MAX_OPACITY - ATTR_MIN_OPACITY) * ((d - 1) / (maxDegree - 1 || 1));
           return `rgba(${ATTR_COLOR}, ${opacity})`;
         })
-        .linkColor(() => 'rgba(255, 255, 255, 0.15)')
-        .linkWidth(0.4)
+        .linkColor(() => 'rgba(255, 255, 255, 0.45)')
+        .linkWidth(1.4)
         .showNavInfo(false);
 
       graphInstance = graph;
