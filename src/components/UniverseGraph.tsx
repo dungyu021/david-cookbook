@@ -3,7 +3,11 @@
 //
 // Step 2:基本渲染(顏色、大小、透明度規則,可旋轉縮放)。
 // Step 3:點擊高亮鄰居、鏡頭飛近、dish 小卡片與跳轉連結、名稱標籤(hover 桌面 / 點擊手機)。
+// Step 3.5:部分食材節點換成 3D 模型(public/models/,對照表見 data/ingredientModels.ts),
+//          其餘食材與所有標籤維持原本的紫色小球。
 import { useEffect, useRef, useState } from 'react';
+import type { Object3D } from 'three';
+import { INGREDIENT_MODELS } from '../data/ingredientModels';
 
 interface GraphNode {
   id: string;
@@ -38,6 +42,9 @@ const ATTR_MAX_OPACITY = 1;
 // 有節點被選中時,非高亮節點/連線變暗的程度
 const DIM_OPACITY = 0.06;
 const DIM_LINK_OPACITY = 0.03;
+
+// 3D 模型自動正規化後的目標最大邊長,對齊 attr 紫色球體的視覺大小(約 11.5,見下方 ATTR_SIZE 換算)
+const MODEL_TARGET_SIZE = 12;
 
 type SelectedDish = { name: string; slug: string; cover: string };
 
@@ -77,13 +84,39 @@ export default function UniverseGraph() {
     let graphInstance: { _destructor?: () => void } | null = null;
 
     (async () => {
-      const [{ default: ForceGraph3D }, res] = await Promise.all([
+      const [{ default: ForceGraph3D }, { GLTFLoader }, THREE, res] = await Promise.all([
         import('3d-force-graph'),
+        import('three/examples/jsm/loaders/GLTFLoader.js'),
+        import('three'),
         fetch('/universe/graph.json'),
       ]);
       if (destroyed) return;
       if (!res.ok) throw new Error(`graph.json 讀取失敗:${res.status}`);
       const data: GraphData = await res.json();
+      if (destroyed || !containerRef.current) return;
+
+      // 預先載入食材 3D 模型,並自動正規化尺寸(依模型實際包圍盒縮放到同一個目標大小,
+      // 不用替每個模型手動調參數)、置中(避免模型本身的建模原點偏移,節點位置看起來會飄)。
+      // nodeThreeObject 的 accessor 必須同步回傳,所以模型要在建圖之前就載入完成。
+      const loader = new GLTFLoader();
+      const modelTemplates = new Map<string, Object3D>();
+      const uniqueModelFiles = Array.from(new Set(Object.values(INGREDIENT_MODELS)));
+      await Promise.all(
+        uniqueModelFiles.map(async (file) => {
+          const gltf = await loader.loadAsync(`/models/${file}`);
+          const scene = gltf.scene;
+          const box = new THREE.Box3().setFromObject(scene);
+          const size = new THREE.Vector3();
+          box.getSize(size);
+          const maxDim = Math.max(size.x, size.y, size.z) || 1;
+          const scale = MODEL_TARGET_SIZE / maxDim;
+          scene.scale.setScalar(scale);
+          const center = new THREE.Vector3();
+          box.getCenter(center).multiplyScalar(scale);
+          scene.position.sub(center);
+          modelTemplates.set(file, scene);
+        }),
+      );
       if (destroyed || !containerRef.current) return;
 
       // 依連線數計算每個 attr 節點的 degree,決定不透明度(連越多越明顯)
@@ -135,11 +168,60 @@ export default function UniverseGraph() {
 
       const linkWidthFor = (l: GraphLink) => (highlightLinks.has(l) ? 2.2 : 1.4);
 
+      // 3D 模型節點是「自訂物件」,不會被 nodeColor 套用(那只影響預設的球體),
+      // 所以高亮/變暗要自己控制材質透明度,這裡記住每個模型節點的實體給 applyModelOpacity 用
+      const modelNodeObjects = new Map<string, Object3D>();
+
+      function cloneModel(template: Object3D): Object3D {
+        const clone = template.clone(true);
+        clone.traverse((obj) => {
+          const mesh = obj as unknown as { isMesh?: boolean; material?: any };
+          if (!mesh.isMesh || !mesh.material) return;
+          // 每個節點要能各自控制透明度(高亮/變暗),材質不能跟其他節點共用同一份
+          const cloneMat = (m: any) => {
+            const c = m.clone();
+            c.transparent = true;
+            return c;
+          };
+          mesh.material = Array.isArray(mesh.material) ? mesh.material.map(cloneMat) : cloneMat(mesh.material);
+        });
+        return clone;
+      }
+
+      const threeObjectFor = (n: GraphNode) => {
+        if (n.subtype !== 'ingredient') return undefined;
+        const file = INGREDIENT_MODELS[n.name];
+        const template = file && modelTemplates.get(file);
+        if (!template) return undefined;
+
+        const instance = cloneModel(template);
+        modelNodeObjects.set(n.id, instance);
+        const group = new THREE.Group();
+        group.add(instance);
+        return group;
+      };
+
+      const applyModelOpacity = () => {
+        modelNodeObjects.forEach((obj, id) => {
+          const alpha = highlightNodeIds.size === 0 || highlightNodeIds.has(id) ? 1 : DIM_OPACITY;
+          obj.traverse((child) => {
+            const mesh = child as unknown as { isMesh?: boolean; material?: unknown };
+            if (mesh.isMesh && mesh.material) {
+              const materials = Array.isArray(mesh.material) ? mesh.material : [mesh.material];
+              materials.forEach((m: any) => {
+                m.opacity = alpha;
+              });
+            }
+          });
+        });
+      };
+
       const graph = new ForceGraph3D(containerRef.current)
         .graphData(data)
         .backgroundColor('#05060f')
         .nodeVal((n: GraphNode) => (n.type === 'dish' ? DISH_SIZE : ATTR_SIZE))
         .nodeColor(colorFor)
+        .nodeThreeObject(threeObjectFor)
         .nodeLabel((n: GraphNode) => n.name)
         .linkColor(linkColorFor)
         .linkWidth(linkWidthFor)
@@ -152,8 +234,10 @@ export default function UniverseGraph() {
       graph.renderer().setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
 
       // 重新指派同一個 accessor 是 3d-force-graph 官方建議的「強制重繪」寫法
+      // (3D 模型節點不吃這招,另外呼叫 applyModelOpacity 直接改材質透明度)
       const refreshHighlight = () => {
         graph.nodeColor(colorFor).linkColor(linkColorFor).linkWidth(linkWidthFor);
+        applyModelOpacity();
       };
 
       // 鏡頭平滑飛近被點擊的節點(維持原本看向節點的方向,只是拉近距離)
