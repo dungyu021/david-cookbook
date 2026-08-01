@@ -39,9 +39,9 @@ const ATTR_SIZE = 3;
 // attr 節點的不透明度依連線數(degree)決定:先給一個區間,由 David 看實機效果調整
 const ATTR_MIN_OPACITY = 0.35;
 const ATTR_MAX_OPACITY = 1;
-// 有節點被選中時,非高亮節點/連線變暗的程度
-const DIM_OPACITY = 0.06;
-const DIM_LINK_OPACITY = 0.03;
+// 有節點被選中時,非高亮節點/連線只保留原本亮度的這個比例(0.3 = 變暗 70%)
+const DIM_FACTOR = 0.3;
+const LINK_BASE_OPACITY = 0.45;
 
 // 3D 模型自動正規化後的目標最大邊長,對齊 attr 紫色球體的視覺大小(約 11.5,見下方 ATTR_SIZE 換算)
 const MODEL_TARGET_SIZE = 12;
@@ -183,20 +183,23 @@ export default function UniverseGraph() {
 
       const colorFor = (n: GraphNode) => {
         const rgb = n.type === 'dish' ? DISH_COLOR_RGB : ATTR_COLOR_RGB;
+        const base = n.type === 'dish' ? 1 : attrOpacity(n);
         let alpha: number;
         if (highlightNodeIds.size === 0) {
-          alpha = n.type === 'dish' ? 1 : attrOpacity(n);
+          alpha = base;
         } else if (highlightNodeIds.has(n.id)) {
           alpha = 1;
         } else {
-          alpha = DIM_OPACITY;
+          alpha = base * DIM_FACTOR;
         }
         return `rgba(${rgb}, ${alpha})`;
       };
 
       const linkColorFor = (l: GraphLink) => {
-        if (highlightLinks.size === 0) return 'rgba(255, 255, 255, 0.45)';
-        return highlightLinks.has(l) ? 'rgba(255, 255, 255, 0.9)' : `rgba(255, 255, 255, ${DIM_LINK_OPACITY})`;
+        if (highlightLinks.size === 0) return `rgba(255, 255, 255, ${LINK_BASE_OPACITY})`;
+        return highlightLinks.has(l)
+          ? 'rgba(255, 255, 255, 0.9)'
+          : `rgba(255, 255, 255, ${LINK_BASE_OPACITY * DIM_FACTOR})`;
       };
 
       const linkWidthFor = (l: GraphLink) => (highlightLinks.has(l) ? 2.2 : 1.4);
@@ -236,7 +239,7 @@ export default function UniverseGraph() {
 
       const applyModelOpacity = () => {
         modelNodeObjects.forEach((obj, id) => {
-          const alpha = highlightNodeIds.size === 0 || highlightNodeIds.has(id) ? 1 : DIM_OPACITY;
+          const alpha = highlightNodeIds.size === 0 || highlightNodeIds.has(id) ? 1 : DIM_FACTOR;
           obj.traverse((child) => {
             const mesh = child as unknown as { isMesh?: boolean; material?: unknown };
             if (mesh.isMesh && mesh.material) {
