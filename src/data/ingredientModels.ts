@@ -32,4 +32,11 @@ export const INGREDIENT_MODELS: Record<string, string> = {
   黑巧克力: 'chocolate.glb',
   濃縮咖啡: 'cup-coffee.glb', // 用一杯咖啡代表,不是生豆
   雞肉: 'chicken-leg.glb',
+  蒜頭: 'garlic.glb',
+  堅果: 'nut.glb',
+  奶油: 'butter.glb',
+  巴西里: 'rosemary.glb', // David 找不到巴西里模型,先用迷迭香代替
+  義大利麵: 'spaghetti.glb',
+  'Carnaroli 燉飯米': 'rice.glb', // 跟白米共用同一顆飯碗模型
+  白米: 'rice.glb',
 };
