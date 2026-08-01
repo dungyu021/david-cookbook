@@ -324,12 +324,14 @@ export default function UniverseGraph() {
 
   return (
     // fixed 蓋滿全螢幕:蓋住 BaseLayout 共用的頁尾,3D 場景才不會被拉出額外的捲動空間
-    <div className="fixed inset-0 z-40 bg-[#05060f]">
+    // select-none + webkit-touch-callout:none:手機長按容易誤觸文字反白、跳出「複製/剪下」選單,
+    // 這個畫面沒有需要選取的文字,直接整頁禁用
+    <div className="fixed inset-0 z-40 select-none bg-[#05060f] [-webkit-touch-callout:none]">
       <div ref={containerRef} className="h-full w-full" />
 
       {status === 'loading' && (
         <div className="absolute inset-0 flex items-center justify-center text-sm text-stone-400">
-          載入料理宇宙中…
+          領域展開中…
         </div>
       )}
 
@@ -413,9 +415,9 @@ export default function UniverseGraph() {
           <button
             type="button"
             onClick={() => resetViewRef.current()}
-            className="pointer-events-auto rounded-full bg-black/40 px-4 py-2 text-sm text-white/90 backdrop-blur-sm"
+            className="pointer-events-auto rounded-full bg-amber-400/30 px-4 py-2 text-sm text-white backdrop-blur-sm"
           >
-            迷路了?點擊這裡
+            迷路了？點擊這裡
           </button>
         </div>
       )}
