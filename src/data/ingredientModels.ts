@@ -22,8 +22,7 @@ export const INGREDIENT_MODELS: Record<string, string> = {
   香菇: 'mushroom.glb', // 套件沒有分香菇/蘑菇,共用同一顆模型
   橘子: 'orange.glb',
   甜橙: 'orange.glb', // 柑橘類共用同一顆模型
-  富士蘋果: 'apple.glb',
-  青蘋果: 'apple.glb', // 蘋果品種共用同一顆模型
+  蘋果: 'apple.glb', // 富士蘋果、青蘋果已在 ingredientCategories.ts 合併為「蘋果」
   紅酒: 'wine-red.glb',
   白酒: 'wine-white.glb',
   蜂蜜: 'honey.glb',

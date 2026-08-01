@@ -86,6 +86,8 @@ const INGREDIENT_ALIASES: Record<string, string> = {
   黃檸檬: '檸檬',
   開心果: '堅果',
   綜合堅果: '堅果',
+  富士蘋果: '蘋果',
+  青蘋果: '蘋果',
 };
 
 // 統一名稱 → 所屬大類別(沒列在這裡的一律視為「其他」)
@@ -119,7 +121,7 @@ const INGREDIENT_CATEGORY: Record<string, CategoryKey> = {
   白吐司: 'gluten',
   麵包粉: 'gluten',
   // 水果
-  富士蘋果: 'fruit',
+  蘋果: 'fruit',
   橘子: 'fruit',
   檸檬: 'fruit',
   甜橙: 'fruit',
