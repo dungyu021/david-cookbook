@@ -42,4 +42,5 @@ export const INGREDIENT_MODELS: Record<string, string> = {
   麵粉: 'flour.glb',
   櫛瓜: 'cucumber.glb',
   小黃瓜: 'cucumber.glb', // 目前還沒有料理用到,先接好等以後用
+  番茄膏: 'ketchup.glb',
 };

@@ -35,3 +35,6 @@
 
 - **Cucumber**(`cucumber.glb`,用來代表小黃瓜與櫛瓜)— https://poly.pizza/m/6aGChBQiu8j
   作者:jeremy — 授權:[CC-BY 3.0](https://creativecommons.org/licenses/by/3.0/)(透過 Poly Pizza)
+
+- **Ketchup**(`ketchup.glb`,用來代表番茄膏)— https://poly.pizza/m/2nAZOVdCDLC
+  作者:Poly by Google — 授權:[CC-BY 3.0](https://creativecommons.org/licenses/by/3.0/)(透過 Poly Pizza)
